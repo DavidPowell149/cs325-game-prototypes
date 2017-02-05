@@ -17,6 +17,7 @@ window.onload = function()
     var game = new Phaser.Game( 600, 760, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
 
     var earthHealth = 100;  // Earth's hitpoints
+    var earthHealthDisplay;     // The text shown on screen
 
     function preload()
     {
@@ -33,7 +34,8 @@ window.onload = function()
         game.add.sprite(0, 0, "background");
         var earth = game.add.sprite(-50, 580, "earth");     // Place it in bottom center
 
-
+        // Initialize Health
+        earthHealthDisplay = game.add.text( 30, 5, earthHealthDisplay, earthHealthLabelStyle );
 
 
 
@@ -50,8 +52,8 @@ window.onload = function()
         //
         // Add some text using a CSS style.
         // Center it in X, and position its top 15 pixels from the top of the world.
-        var style = { font: "15px Verdana", fill: "#9999ff", align: "center" };
-        var text = game.add.text( 10, 5, "Health: " + earthHealth, style );
+        var earthHealthLabelStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" };
+        var earthHealthLabel = game.add.text( 10, 5, "Health: ", earthHealthLabelStyle );
     }
 
     // Runs every tick/iteration/moment/second
