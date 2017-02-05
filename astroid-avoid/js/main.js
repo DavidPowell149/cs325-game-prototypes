@@ -32,12 +32,11 @@ window.onload = function()
     {
         // The space background
         game.add.sprite(0, 0, "background");
-        var earth = game.add.sprite(-50, 580, "earth");     // Place it in bottom center
+        // Create earth object
+        var earth = Earth(game, "earth");
 
         // Initialize Health
         earthHealthDisplay = game.add.text( 30, 5, earthHealthDisplay, earthHealthLabelStyle );
-
-
 
         // // Create a sprite at the center of the screen using the 'logo' image.
         // bouncy = game.add.sprite( game.world.centerX, game.world.centerY, 'earth' );
@@ -80,5 +79,6 @@ window.onload = function()
     function gameOver()
     {
         console.log("Game Over");
+        //game.destroy();
     }
 };
