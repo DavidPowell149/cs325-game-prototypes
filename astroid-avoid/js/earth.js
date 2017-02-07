@@ -1,3 +1,5 @@
+// Creates and sets up an Earth object
+// Params: The game variable, and the name of the sprite
 function Earth(game, spriteName)
 {
     // Dictionary for public values

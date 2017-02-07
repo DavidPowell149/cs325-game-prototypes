@@ -17,8 +17,10 @@ window.onload = function()
     // Global variables
     var game = new Phaser.Game( 600, 760, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var earth;  // Our home planet, which we aim to protect
+    var earthHealthLabel;   // Earth's health counter, displayed in the upper-left
 
-    // Functio
+
+    // Pre loads assets for game load
     function preload()
     {
         // Load in game assets
@@ -26,19 +28,19 @@ window.onload = function()
         game.load.image( 'earth', 'assets/earth.png' );
     }
 
-
-
+    // Called on game's initial creation state
     function create()
     {
         // The space background
         game.add.sprite(0, 0, "background");
-        //game.add.sprite(-50, 580, "earth");     // Place it in bottom center
+
         // Create earth object
         earth = Earth(game, "earth");
-        console.log(earth.sprite);
-        // Initialize
-        var earthHealthStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" };
-        var earthHealthLabel = game.add.text( 10, 5, "Health: " + earth.health, earthHealthStyle );
+        
+        // Initialize health display
+        var earthHealthStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" }; // Make a style
+        //earthHealthLabel = game.add.text( 10, 5, "Health: " + earth.health, earthHealthStyle ); // Apply it
+        earthHealthLabel = game.add.text(10, 5, "Health: " + earth.health, earthHealthStyle ); // Apply it
     }
 
     // Runs every tick/iteration/moment/second
@@ -58,8 +60,9 @@ window.onload = function()
             gameOver(); // The player has died
         }
 
-        // var style = { font: "15px Verdana", fill: "#9999ff", align: "center" };
-        // var text = game.add.text( 10, 5, "Health: " + earthHealth, style );
+
+        var earthHealthStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" };
+        earthHealthLabel.setText("Health: " + earth.health);
     }
 
     function gameOver()
