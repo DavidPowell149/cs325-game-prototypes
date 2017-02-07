@@ -1,13 +1,41 @@
+// Creates and sets up an Astroid object
+// Params: The game variable, and the name of the sprite. Type is either 1,2,3 for small/medium/large asteroids
 function Astroid(game, spriteName)
 {
     // Dictionary for public values
-    var obj = {};
+    var sprite = game.add.sprite(0, 0, spriteName);     // Place it in bottom center
 
-    game.add.sprite(10, 10, spriteName);     // Place it in bottom center
+    var health;   // Number of hitpoints
 
-    obj.health = 100;   // Number of hitpoints
+    var speed;     // Rate at which asteroid falls
 
-    obj.size = 100;     // Percentage of max size
+    // Setup asteroid type
+    if(spriteName === "small-astroid")          { speed = 20; health = 10; }
+    else if(spriteName === "medium-astroid")    { speed = 10; health = 70; }
+    else if(spriteName === "large-astroid")     { speed = 5;  health = 200; }
+    else { console.log("Incorrect astroid type. Setting to large to punish you"); }
 
-    return obj;
+    this.damage = function(healthDelta)
+    {
+        health = health + healthDelta;
+    }
+
+    this.getHealth = function()
+    {
+        return health;
+    }
+
+    // Set the sprite to a location
+    this.setTo = function(x, y)
+    {
+        sprite.x = x;
+        sprite.y = y;
+    }
+
+    // Moves the asteroid by a certain amount
+    this.move = function(changeX, changeY)
+    {
+        sprite.x = sprite.x + changeX;
+        sprite.y = sprite.y + changeY;
+    }
 }
