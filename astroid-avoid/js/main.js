@@ -18,7 +18,7 @@ window.onload = function()
     var game = new Phaser.Game( 600, 760, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var earth;  // Our home planet, which we aim to protect
     var earthHealthLabel;   // Earth's health counter, displayed in the upper-left
-
+    var astroids;  // Asteroids
 
     // Pre loads assets for game load
     function preload()
@@ -26,6 +26,9 @@ window.onload = function()
         // Load in game assets
         game.load.image( 'background', 'assets/space_background.png' );
         game.load.image( 'earth', 'assets/earth.png' );
+        game.load.image( 'small-astroid', 'assets/astroid_small.png' );
+        game.load.image( 'medium-astroid', 'assets/astroid_medium.png' );
+        game.load.image( 'large-astroid', 'assets/astroid_large.png' );
     }
 
     // Called on game's initial creation state
@@ -34,9 +37,12 @@ window.onload = function()
         // The space background
         game.add.sprite(0, 0, "background");
 
-        // Create earth object
+        // Create earth object and set location
         earth = new Earth(game, "earth");
-
+        earth.setTo(-50, 580);
+        var astroid = new Astroid(game, "small-astroid");
+        astroid.setTo(100, 100);
+        astroid.getSprite().events.onInputDown.add(listener, this);
 
         // Initialize health display
         var earthHealthStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" }; // Make a style
@@ -48,10 +54,14 @@ window.onload = function()
     function update()
     {
         updateEarthHealth();     // Adjust the earth's health counter
+        //updateAstroid();
     }
 
 
-
+    function listener()
+    {
+        earth.damage(-1);
+    }
 
 
     function updateEarthHealth()
