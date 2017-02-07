@@ -14,11 +14,11 @@ window.onload = function()
 
     "use strict";
 
+    // Global variables
     var game = new Phaser.Game( 600, 760, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var earth;  // Our home planet, which we aim to protect
 
-    var earthHealth = 100;  // Earth's hitpoints
-    var earthHealthDisplay;     // The text shown on screen
-
+    // Functio
     function preload()
     {
         // Load in game assets
@@ -26,33 +26,19 @@ window.onload = function()
         game.load.image( 'earth', 'assets/earth.png' );
     }
 
-    var bouncy;
+
 
     function create()
     {
         // The space background
         game.add.sprite(0, 0, "background");
+        //game.add.sprite(-50, 580, "earth");     // Place it in bottom center
         // Create earth object
-        var earth = Earth(game, "earth");
-
-        // Initialize Health
-        earthHealthDisplay = game.add.text( 30, 5, earthHealthDisplay, earthHealthLabelStyle );
-
-        // // Create a sprite at the center of the screen using the 'logo' image.
-        // bouncy = game.add.sprite( game.world.centerX, game.world.centerY, 'earth' );
-        // // Anchor the sprite at its center, as opposed to its top-left corner.
-        // // so it will be truly centered.
-        // bouncy.anchor.setTo( 0.5, 0.5 );
-        //
-        // // Turn on the arcade physics engine for this sprite.
-        // game.physics.enable( bouncy, Phaser.Physics.ARCADE );
-        // // Make it bounce off of the world bounds.
-        // bouncy.body.collideWorldBounds = true;
-        //
-        // Add some text using a CSS style.
-        // Center it in X, and position its top 15 pixels from the top of the world.
-        var earthHealthLabelStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" };
-        var earthHealthLabel = game.add.text( 10, 5, "Health: ", earthHealthLabelStyle );
+        earth = Earth(game, "earth");
+        console.log(earth.sprite);
+        // Initialize
+        var earthHealthStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" };
+        var earthHealthLabel = game.add.text( 10, 5, "Health: " + earth.health, earthHealthStyle );
     }
 
     // Runs every tick/iteration/moment/second
@@ -67,7 +53,7 @@ window.onload = function()
 
     function updateHealth()
     {
-        if(earthHealth <= 0)
+        if(earth.health <= 0)
         {
             gameOver(); // The player has died
         }
