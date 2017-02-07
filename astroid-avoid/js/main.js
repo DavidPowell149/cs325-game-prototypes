@@ -35,8 +35,9 @@ window.onload = function()
         game.add.sprite(0, 0, "background");
 
         // Create earth object
-        earth = Earth(game, "earth");
-        
+        earth = new Earth(game, "earth");
+
+
         // Initialize health display
         var earthHealthStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" }; // Make a style
         //earthHealthLabel = game.add.text( 10, 5, "Health: " + earth.health, earthHealthStyle ); // Apply it
@@ -46,23 +47,23 @@ window.onload = function()
     // Runs every tick/iteration/moment/second
     function update()
     {
-        updateHealth();     // Adjust the earth's health counter
+        updateEarthHealth();     // Adjust the earth's health counter
     }
 
 
 
 
 
-    function updateHealth()
+    function updateEarthHealth()
     {
-        if(earth.health <= 0)
+        if(earth.getHealth() <= 0)
         {
-            gameOver(); // The player has died
+            gameOver(); // The Earth has been destroyed
         }
 
 
         var earthHealthStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" };
-        earthHealthLabel.setText("Health: " + earth.health);
+        earthHealthLabel.setText("Health: " + earth.getHealth());
     }
 
     function gameOver()

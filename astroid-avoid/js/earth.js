@@ -3,18 +3,19 @@
 function Earth(game, spriteName)
 {
     // Dictionary for public values
-    var obj = {};
+    var sprite = game.add.sprite(-50, 580, spriteName);     // Place it in bottom center
 
-    obj.sprite = game.add.sprite(-50, 580, spriteName);     // Place it in bottom center
+    var health = 100;   // Number of hitpoints
 
-    obj.health = 100;   // Number of hitpoints
+    var size = 100;     // Percentage of max size
 
-    obj.size = 100;     // Percentage of max size
-
-    obj.incrimentHealth = function(healthDelta)
+    this.incrimentHealth = function(healthDelta)
     {
-        this.health = this.health + healthDelta;
+        health = health + healthDelta;
     }
 
-    return obj;
+    this.getHealth = function()
+    {
+        return health;
+    }
 }
