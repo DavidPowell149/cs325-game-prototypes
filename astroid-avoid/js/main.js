@@ -19,6 +19,7 @@ window.onload = function()
     var earth;  // Our home planet, which we aim to protect
     var earthHealthLabel;   // Earth's health counter, displayed in the upper-left
     var astroids;  // Asteroids
+    var astroid;
 
     // Pre loads assets for game load
     function preload()
@@ -40,7 +41,7 @@ window.onload = function()
         // Create earth object and set location
         earth = new Earth(game, "earth");
         earth.setTo(-50, 580);
-        var astroid = new Astroid(game, "small-astroid");
+        astroid = new Astroid(game, "small-astroid");
         astroid.setTo(100, 100);
         astroid.getSprite().events.onInputDown.add(listener, this);
 
@@ -55,12 +56,13 @@ window.onload = function()
     {
         updateEarthHealth();     // Adjust the earth's health counter
         //updateAstroid();
+        astroid.move(0, astroid.getSpeed());
     }
 
 
     function listener()
     {
-        earth.damage(-1);
+        earth.damage(-1);   // Test for now
     }
 
 
