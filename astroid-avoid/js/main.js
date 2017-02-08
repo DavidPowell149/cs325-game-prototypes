@@ -18,8 +18,12 @@ window.onload = function()
     var game = new Phaser.Game( 600, 760, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var earth;  // Our home planet, which we aim to protect
     var earthHealthLabel;   // Earth's health counter, displayed in the upper-left
-    var astroids;  // Asteroids
-    var astroid;
+    var astroidGroup; // Asteroids
+    var tempAstroid;    // An astroid
+    var smallProb=1.0;  var mediumProb=0.0; var largeProb=0.0;  // Probability of getting each astroid
+    var astroidSpawnTime = 200;   // The rate at which astroids spawn
+    var lastAstroidSpawnTime = 0;   // Time since last astroid spawn
+    var astroidType;  // The type of astroid to spawn
 
     // Pre loads assets for game load
     function preload()
@@ -41,9 +45,12 @@ window.onload = function()
         // Create earth object and set location
         earth = new Earth(game, "earth");
         earth.setTo(-50, 580);
-        astroid = new Astroid(game, "small-astroid");
-        astroid.setTo(100, 100);
-        astroid.getSprite().events.onInputDown.add(listener, this);
+
+        // Create a group of astroids
+        astroidGroup = game.add.group();
+
+
+
 
         // Initialize health display
         var earthHealthStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" }; // Make a style
@@ -55,16 +62,75 @@ window.onload = function()
     function update()
     {
         updateEarthHealth();     // Adjust the earth's health counter
-        //updateAstroid();
-        astroid.move(0, astroid.getSpeed());
+
+        updateAstroid();
+
     }
 
-
-    function listener()
+    function updateAstroid()
     {
-        earth.damage(-1);   // Test for now
+        astroidType = "small-astroid";
+        // Check if are allowed to spawn an astroid
+        if(game.time.now - lastAstroidSpawnTime > astroidSpawnTime)
+        {
+            lastAstroidSpawnTime = game.time.now;
+
+            if(astroidGroup.countLiving() < 5)
+            {
+                // Add some astroids
+                tempAstroid = new Astroid(game, astroidType);
+                astroidGroup.add(tempAstroid.getSprite());
+                tempAstroid.setTo(Math.random()*500 + 50, -50);
+                tempAstroid.getSprite().events.onInputDown.add(astroidClick, this, tempAstroid.getSprite());
+
+            }
+        }
+
+        // Do stuff for each astroid
+        astroidGroup.forEach( function(astroid)
+        {
+            // Move the astroid
+            astroid.y = astroid.y + 5;
+
+            // Check for collision
+            if(astroid.overlap(earth.getSprite()))
+            {
+                console.log("Earth is hit!");
+                astroidHit(astroid);
+            }
+
+        }, this);
+        //tempAstroid.move(0, 1); // Only works for one
+        // if((game.time.now/1000) >= 15)
+        // {
+        //     smallProb = 0.6;
+        //     mediumProb = ;
+        // }
+        // if((game.time.now/1000) >= 40)
+        // {
+        //
+        // }
     }
 
+
+
+
+    // Called when earth is hit by an astroid
+    function astroidHit(astroid)
+    {
+
+    }
+
+    // Function that is called when the astroid is clicked
+    function astroidClick(astroid)
+    {
+        astroid.destroy();
+    }
+
+    function moveAstroid(astroid)
+    {
+        astroid.move(0, 1);
+    }
 
     function updateEarthHealth()
     {

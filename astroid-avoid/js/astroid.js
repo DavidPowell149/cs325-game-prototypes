@@ -8,42 +8,17 @@ function Astroid(game, spriteName)
     var health;   // Number of hitpoints
 
     var speed;     // Rate at which asteroid falls
-
+    //console.log(spriteName);
     // Setup asteroid type
-    if(spriteName === "small-astroid")          { speed = 0.1; health = 10; }
-    else if(spriteName === "medium-astroid")    { speed = 1; health = 70; }
-    else if(spriteName === "large-astroid")     { speed = 0.1;  health = 200; }
+    if(spriteName === "small-astroid")          { speed = 1; health = 10; }
+    else if(spriteName === "medium-astroid")    { speed = 0.5; health = 70; }
+    else if(spriteName === "large-astroid")     { speed = 0.05;  health = 200; }
     else { console.log("Incorrect astroid type. Setting to large to punish you"); }
 
 
-    // Function that runs every tick, specifically for astroid.
-    this.updateAstroid = function()
-    {
-
-    }
 
 
 
-
-    this.damage = function(healthDelta)
-    {
-        health = health + healthDelta;
-    }
-
-    this.getHealth = function()
-    {
-        return health;
-    }
-
-    this.getSprite = function()
-    {
-        return sprite;
-    }
-
-    this.getSpeed = function()
-    {
-        return speed;
-    }
 
     // Set the sprite to a location
     this.setTo = function(x, y)
@@ -57,5 +32,34 @@ function Astroid(game, spriteName)
     {
         sprite.x = sprite.x + changeX;
         sprite.y = sprite.y + changeY;
+    }
+
+
+
+
+
+    this.damage = function(hurtValue)
+    {
+        health = health - hurtValue;
+    }
+
+    this.getHealth = function()
+    {
+        return health;
+    }
+
+    this.getSprite = function()
+    {
+        return sprite;
+    }
+
+    this.setSprite = function(newSprite)
+    {
+        this.sprite = newSprite;
+    }
+
+    this.getSpeed = function()
+    {
+        return speed;
     }
 }

@@ -1,6 +1,6 @@
 // Creates and sets up an Earth object
 // Params: The game variable, and the name of the sprite
-function Earth(game, spriteName, size)
+function Earth(game, spriteName)
 {
     // Dictionary for public values
     var sprite = game.add.sprite(0, 0, spriteName);     // Place it in bottom center
@@ -8,9 +8,9 @@ function Earth(game, spriteName, size)
 
     var health = 100;   // Number of hitpoints
 
-    this.damage = function(healthDelta)
+    this.damage = function(hurtValue)
     {
-        health = health + healthDelta;
+        health = health - hurtValue;
     }
 
     this.getHealth = function()
