@@ -118,7 +118,8 @@ window.onload = function()
     // Called when earth is hit by an astroid
     function astroidHit(astroid)
     {
-
+        astroid.destroy();
+        earth.damage(10);
     }
 
     // Function that is called when the astroid is clicked
@@ -147,6 +148,8 @@ window.onload = function()
     function gameOver()
     {
         console.log("Game Over");
-        //game.destroy();
+        //game.destroy();   // Overkill but I am on a time constraint. Thanks for reading my code by the way.
+
+        game.lockRender = true; // Game is still running in the background but it looks dead
     }
 };
