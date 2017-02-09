@@ -26,6 +26,8 @@ window.onload = function()
     var lastAstroidSpawnTime = 0;   // Time since last astroid spawn
     var astroidType;  // The type of astroid to spawn
 
+    var music;
+
     // Pre loads assets for game load
     function preload()
     {
@@ -35,6 +37,8 @@ window.onload = function()
         game.load.image( 'small-astroid', 'assets/astroid_small.png' );
         game.load.image( 'medium-astroid', 'assets/astroid_medium.png' );
         game.load.image( 'large-astroid', 'assets/astroid_large.png' );
+
+        game.load.audio( 'background-music', 'assets/audio/music/intergalactic.mp3');
     }
 
     // Called on game's initial creation state
@@ -42,7 +46,8 @@ window.onload = function()
     {
         // The space background
         game.add.sprite(0, 0, "background");
-
+        music = game.add.audio('background-music');
+        music.play();
         // Create earth object and set location
         earth = new Earth(game, "earth");
         earth.setTo(-50, 580);
