@@ -20,8 +20,9 @@ window.onload = function()
     var earthHealthLabel;   // Earth's health counter, displayed in the upper-left
     var astroidGroup; // Asteroids
     var tempAstroid;    // An astroid
+    var maxAstroidsOnScreen = 10;   // Maximum number of astroids on the screen
     var smallProb=1.0;  var mediumProb=0.0; var largeProb=0.0;  // Probability of getting each astroid
-    var astroidSpawnTime = 200;   // The rate at which astroids spawn
+    var astroidSpawnTime = 1000;   // The rate at which astroids spawn
     var lastAstroidSpawnTime = 0;   // Time since last astroid spawn
     var astroidType;  // The type of astroid to spawn
 
@@ -50,8 +51,6 @@ window.onload = function()
         astroidGroup = game.add.group();
 
 
-
-
         // Initialize health display
         var earthHealthStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" }; // Make a style
         //earthHealthLabel = game.add.text( 10, 5, "Health: " + earth.health, earthHealthStyle ); // Apply it
@@ -64,21 +63,43 @@ window.onload = function()
         updateEarthHealth();     // Adjust the earth's health counter
 
         updateAstroid();
-
     }
 
     function updateAstroid()
     {
         astroidType = "small-astroid";
+
+
+        // Which type of astroid should we spawn?
+        var typeValue = Math.random();
+        if((game.time.now/1000) >= 30)
+        {
+            if(typeValue >= 0.9)   { astroidType = "large-astroid" }       // 10% chance large
+            else if(typeValue >= 0.6)   { astroidType = "medium-astroid" } // 30% chance medium
+        }
+        else if((game.time.now/1000) >= 15)
+        {
+            if(typeValue >= 0.6)   { astroidType = "medium-astroid" }      // 60% chance large
+            else                    { astroidType = "small-astroid" }       // 40% chance large
+        }
+
+
+
+
         // Check if are allowed to spawn an astroid
         if(game.time.now - lastAstroidSpawnTime > astroidSpawnTime)
         {
             lastAstroidSpawnTime = game.time.now;
 
-            if(astroidGroup.countLiving() < 5)
+            if(astroidGroup.countLiving() < maxAstroidsOnScreen)
             {
                 // Add some astroids
                 tempAstroid = new Astroid(game, astroidType);
+                tempAstroid.getSprite().anchor.setTo(0.5, 0.5);
+                if(astroidType !== "large-astroid")
+                {   // Only rotate if it isn't the large astroid
+                    tempAstroid.getSprite().angle = Math.random()*360;
+                }
                 astroidGroup.add(tempAstroid.getSprite());
                 tempAstroid.setTo(Math.random()*500 + 50, -50);
                 tempAstroid.getSprite().events.onInputDown.add(astroidClick, this, tempAstroid.getSprite());
@@ -100,16 +121,13 @@ window.onload = function()
             }
 
         }, this);
-        //tempAstroid.move(0, 1); // Only works for one
-        // if((game.time.now/1000) >= 15)
-        // {
-        //     smallProb = 0.6;
-        //     mediumProb = ;
-        // }
-        // if((game.time.now/1000) >= 40)
-        // {
-        //
-        // }
+
+
+        // Adjust the spawn rate of the astroids for difficulty
+        if(astroidSpawnTime > 400)
+        {
+            astroidSpawnTime -= 0.5;
+        }
     }
 
 
@@ -118,19 +136,21 @@ window.onload = function()
     // Called when earth is hit by an astroid
     function astroidHit(astroid)
     {
-        astroid.destroy();
-        earth.damage(10);
+        astroid.destroy();  // Destroy the astroid
+        earth.damage(1);   // Earth has been hit
     }
 
     // Function that is called when the astroid is clicked
     function astroidClick(astroid)
     {
-        astroid.destroy();
+        console.log("Clicked");
+        // astroid.destroy();
+        astroid.damage(50);
     }
 
     function moveAstroid(astroid)
     {
-        astroid.move(0, 1);
+        astroid.move(0, 0.5);
     }
 
     function updateEarthHealth()

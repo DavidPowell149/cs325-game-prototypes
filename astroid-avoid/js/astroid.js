@@ -13,9 +13,7 @@ function Astroid(game, spriteName)
     if(spriteName === "small-astroid")          { speed = 1; health = 10; }
     else if(spriteName === "medium-astroid")    { speed = 0.5; health = 70; }
     else if(spriteName === "large-astroid")     { speed = 0.05;  health = 200; }
-    else { console.log("Incorrect astroid type. Setting to large to punish you"); }
-
-
+    else { console.log("Not a real astroid type") }
 
 
 
@@ -35,7 +33,10 @@ function Astroid(game, spriteName)
     }
 
 
-
+    this.getSpriteName = function()
+    {
+        return spriteName;
+    }
 
 
     this.damage = function(hurtValue)
