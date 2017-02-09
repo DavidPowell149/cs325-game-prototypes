@@ -8,14 +8,20 @@ function Earth(game, spriteName)
 
     var health = 100;   // Number of hitpoints
 
-    this.damage = function(hurtValue)
+    this.reduceHealth = function(hurtValue)
     {
-        health = health - hurtValue;
+        this.health = this.health - hurtValue;
+    }
+
+    this.setHealth = function(newHealth)
+    {
+        this.health = newHealth;
+        //console.log(this.health);
     }
 
     this.getHealth = function()
     {
-        return health;
+        return this.health;
     }
 
     this.getSprite = function()

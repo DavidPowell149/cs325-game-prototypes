@@ -46,6 +46,7 @@ window.onload = function()
         // Create earth object and set location
         earth = new Earth(game, "earth");
         earth.setTo(-50, 580);
+        earth.setHealth(100);   // Need to set the health
 
         // Create a group of astroids
         astroidGroup = game.add.group();
@@ -60,9 +61,11 @@ window.onload = function()
     // Runs every tick/iteration/moment/second
     function update()
     {
+        updateAstroid();
+
         updateEarthHealth();     // Adjust the earth's health counter
 
-        updateAstroid();
+
     }
 
     function updateAstroid()
@@ -74,16 +77,14 @@ window.onload = function()
         var typeValue = Math.random();
         if((game.time.now/1000) >= 30)
         {
-            if(typeValue >= 0.9)   { astroidType = "large-astroid" }       // 10% chance large
-            else if(typeValue >= 0.6)   { astroidType = "medium-astroid" } // 30% chance medium
+            if(typeValue >= 0.9)        { astroidType = "large-astroid" }   // 10% chance large
+            else if(typeValue >= 0.6)   { astroidType = "medium-astroid" }  // 30% chance medium
         }
         else if((game.time.now/1000) >= 15)
         {
-            if(typeValue >= 0.6)   { astroidType = "medium-astroid" }      // 60% chance large
+            if(typeValue >= 0.6)    { astroidType = "medium-astroid" }      // 60% chance large
             else                    { astroidType = "small-astroid" }       // 40% chance large
         }
-
-
 
 
         // Check if are allowed to spawn an astroid
@@ -110,13 +111,16 @@ window.onload = function()
         // Do stuff for each astroid
         astroidGroup.forEach( function(astroid)
         {
+            var astroidSpeed;
+            if(astroidType === "small-astroid")          { astroidSpeed = 5; }
+            else if(astroidType === "medium-astroid")    { astroidSpeed = 2; }
+            else if(astroidType === "large-astroid")     { astroidSpeed = 1; }
             // Move the astroid
-            astroid.y = astroid.y + 5;
+            astroid.y = astroid.y + astroidSpeed;
 
             // Check for collision
             if(astroid.overlap(earth.getSprite()))
             {
-                console.log("Earth is hit!");
                 astroidHit(astroid);
             }
 
@@ -124,7 +128,7 @@ window.onload = function()
 
 
         // Adjust the spawn rate of the astroids for difficulty
-        if(astroidSpawnTime > 400)
+        if(astroidSpawnTime > 200)
         {
             astroidSpawnTime -= 0.5;
         }
@@ -136,40 +140,40 @@ window.onload = function()
     // Called when earth is hit by an astroid
     function astroidHit(astroid)
     {
+        var astroidDamage;
+        if(astroidType === "small-astroid")          { astroidDamage = 2;   }
+        else if(astroidType === "medium-astroid")    { astroidDamage = 20;  }
+        else if(astroidType === "large-astroid")     { astroidDamage = 100; }
+        //console.log(astroidDamage);
+
         astroid.destroy();  // Destroy the astroid
-        earth.damage(1);   // Earth has been hit
+        earth.reduceHealth(astroidDamage);   // Earth has been hit
     }
 
     // Function that is called when the astroid is clicked
     function astroidClick(astroid)
     {
-        console.log("Clicked");
-        // astroid.destroy();
-        astroid.damage(50);
-    }
-
-    function moveAstroid(astroid)
-    {
-        astroid.move(0, 0.5);
+        astroid.destroy();
     }
 
     function updateEarthHealth()
     {
         if(earth.getHealth() <= 0)
         {
+            earth.setHealth(0);
+            earthHealthLabel.setText("GAME OVER");
             gameOver(); // The Earth has been destroyed
+            // Calling game over locks the game prematurely for some reason
+        }
+        else
+        {
+            earthHealthLabel.setText("Health: " + earth.getHealth());
         }
 
-
-        var earthHealthStyle = { font: "15px Verdana-bold", fill: "#FF0000", align: "center" };
-        earthHealthLabel.setText("Health: " + earth.getHealth());
     }
 
     function gameOver()
     {
-        console.log("Game Over");
-        //game.destroy();   // Overkill but I am on a time constraint. Thanks for reading my code by the way.
-
-        game.lockRender = true; // Game is still running in the background but it looks dead
+        game.destroy();       // Overkill but I am on a time constraint. Thanks for reading my code by the way.
     }
 };

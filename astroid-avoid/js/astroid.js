@@ -39,8 +39,9 @@ function Astroid(game, spriteName)
     }
 
 
-    this.damage = function(hurtValue)
+    this.damaged = function(hurtValue)
     {
+        console.log("Damage");
         health = health - hurtValue;
     }
 
