@@ -16,22 +16,25 @@ window.onload = function()
 
     // Global variables
     var game = new Phaser.Game( 1100, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var heart;      // The player
 
-
-    var music;
 
     // Pre loads assets for game load
     function preload()
     {
         // Load in game assets
-        //game.load.image( 'background', 'assets/space_background.png' );
+        game.load.image( "heart", 'assets/heart.png' );
     }
 
     // Called on game's initial creation state
     function create()
     {
-        // The space background
+        // The yellow color background
         game.stage.backgroundColor = "FFFFCC";
+
+        heart = game.add.sprite(game.world.centerX/2, game.world.centerY, "heart");
+        heart.anchor.setTo(0.5, 0.5);   // Sets the reference point to the center of the sprite, not the default top left corner
+        heart.scale.setTo(0.3, 0.3);
     }
 
     // Runs every tick/iteration/moment/second
