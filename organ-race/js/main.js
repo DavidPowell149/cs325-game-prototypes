@@ -91,8 +91,8 @@ window.onload = function()
             lastSpikeSpawnTime = game.time.now;
 
             var rand = Math.random();
-            if(rand > 0.80) {spawnSpike("spike-top");}            // 15% chance of spawning a top spike
-            else if(rand > 0.60) {spawnSpike("spike-bottom");}     // 15% chance of spawning a bottom spike
+            if(rand > 0.75) {spawnSpike("spike-top");}            // 25% chance of spawning a top spike
+            else if(rand > 0.50) {spawnSpike("spike-bottom");}     // 25% chance of spawning a bottom spike
         }
 
         // Do stuff for each spike
