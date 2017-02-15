@@ -34,11 +34,15 @@ window.onload = function()
     var bloodGroup;     // A group for the blood cells
     var tempBlood;      // A temp blood cell to add it to the group
 
+    // Spikes and blood
     var spikeSpawnTime = 1000;
     var lastSpikeSpawnTime = 0;
     var bloodSpawnTime = 550;
     var lastBloodSpawnTime = 0;
 
+    // Scoring
+    var score = 0;
+    var scoreText;
 
     // Pre loads assets for game load
     function preload()
@@ -66,6 +70,9 @@ window.onload = function()
         spikeGroup = game.add.group();  // Group for spikes
         bloodGroup = game.add.group();  // Group for spikes
 
+        var style = { font: "15px Verdana", fill: "#FFFFFF", align: "center" };
+        scoreText = game.add.text(20, 5, "Score: " + score, style );
+
         // Initialize the keys
         upKey = game.input.keyboard.addKey(Phaser.KeyCode.UP);
         downKey = game.input.keyboard.addKey(Phaser.KeyCode.DOWN);
@@ -77,7 +84,15 @@ window.onload = function()
         playerMovement()
         boundryCheck();
         updateTrack();
+        updateScore();
     }
+
+
+    function updateScore()
+    {
+        scoreText.setText("Score: " + score);
+    }
+
 
 
     function updateTrack()
@@ -103,8 +118,8 @@ window.onload = function()
         {
             lastBloodSpawnTime = game.time.now;
 
-            var rand = Math.random();spawnBlood();
-            //if(rand > 0.40) {spawnBlood();}   // 25% chance of spawning a blood cell
+            var rand = Math.random();
+            if(rand > 0.40) {spawnBlood();}   // 25% chance of spawning a blood cell
         }
 
         // Do stuff for each spike
@@ -113,6 +128,12 @@ window.onload = function()
             // Runs for each item in the group
             currentSpike.x -= track_current_speed;
 
+            // Check for collision
+            if(currentSpike.overlap(heart))
+            {
+                gameOver();
+            }
+
         }, this);
 
         // Do stuff for each spike
@@ -120,6 +141,14 @@ window.onload = function()
         {
             // Runs for each item in the group
             currentBlood.x -= track_current_speed;
+
+            // Check for collision
+            if(currentBlood.overlap(heart))
+            {
+                console.log(currentBlood);
+                score += 10;
+                currentBlood.destroy()
+            }
 
         }, this);
     }
@@ -143,7 +172,6 @@ window.onload = function()
 
     function spawnBlood()
     {
-
         tempBlood = game.add.sprite(game.world.width + 50, Math.random()*(game.world.height-150)+75, "blood-cell");
         tempBlood.anchor.setTo(0.5, 0.5);
         tempBlood.scale.setTo(0.1, 0.1);
@@ -152,11 +180,11 @@ window.onload = function()
     }
 
 
-
-
-
-
-
+    function gameOver()
+    {
+        scoreText.setText("GAME OVER --------- Final score was " + score);
+        game.lockRender = true;
+    }
 
 
     function playerMovement()
@@ -168,11 +196,13 @@ window.onload = function()
             if(!heart.overlap(borderTop))
             {
                 if (upKey.isDown) { accelerate(1); moveUp(); }
-            } else { accelerateIdle() }
+            }
+            else { accelerateIdle() }
             if(!heart.overlap(borderBottom))
             {
                 if (downKey.isDown) { accelerate(-1); moveDown();  }
-            } else { accelerateIdle() }
+            }
+            else { accelerateIdle() }
 
 
         }
