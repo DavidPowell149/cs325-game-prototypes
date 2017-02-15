@@ -36,6 +36,8 @@ window.onload = function()
 
     var spikeSpawnTime = 1000;
     var lastSpikeSpawnTime = 0;
+    var bloodSpawnTime = 550;
+    var lastBloodSpawnTime = 0;
 
 
     // Pre loads assets for game load
@@ -86,6 +88,7 @@ window.onload = function()
         else
             track_current_speed += track_acceleration;
 
+        // Spawn spikes if allowed
         if((game.time.now - lastSpikeSpawnTime) > spikeSpawnTime)
         {
             lastSpikeSpawnTime = game.time.now;
@@ -95,6 +98,15 @@ window.onload = function()
             else if(rand > 0.50) {spawnSpike("spike-bottom");}     // 25% chance of spawning a bottom spike
         }
 
+        // Spawn blood if allowed
+        if((game.time.now - lastBloodSpawnTime) > bloodSpawnTime)
+        {
+            lastBloodSpawnTime = game.time.now;
+
+            var rand = Math.random();spawnBlood();
+            //if(rand > 0.40) {spawnBlood();}   // 25% chance of spawning a blood cell
+        }
+
         // Do stuff for each spike
         spikeGroup.forEach( function(currentSpike)
         {
@@ -102,12 +114,18 @@ window.onload = function()
             currentSpike.x -= track_current_speed;
 
         }, this);
+
+        // Do stuff for each spike
+        bloodGroup.forEach( function(currentBlood)
+        {
+            // Runs for each item in the group
+            currentBlood.x -= track_current_speed;
+
+        }, this);
     }
 
     function spawnSpike(spikeType)
     {
-        console.log("Spawning spike:" + spikeType);
-
         tempSpike = game.add.sprite(game.world.width + 50, game.world.centerY, spikeType);
         if(spikeType === "spike-top")
         {
@@ -125,21 +143,12 @@ window.onload = function()
 
     function spawnBlood()
     {
-        console.log("Spawning blood");
 
-        tempBlood = game.add.sprite(game.world.width + 50, game.world.centerY, spikeType);
-        if(spikeType === "spike-top")
-        {
-            tempSpike.anchor.setTo(0, 0);   // Top left
-            tempSpike.y = borderTop.height - 5;
-        }
-        else if(spikeType === "spike-bottom")
-        {
-            tempSpike.anchor.setTo(0, 1.0); // Bottom left
-            tempSpike.y = game.world.height - borderTop.height + 5;
-        }
-
-        spikeGroup.add(tempSpike);
+        tempBlood = game.add.sprite(game.world.width + 50, Math.random()*(game.world.height-150)+75, "blood-cell");
+        tempBlood.anchor.setTo(0.5, 0.5);
+        tempBlood.scale.setTo(0.1, 0.1);
+        tempBlood.angle = Math.random()*360;
+        bloodGroup.add(tempBlood);
     }
 
 
