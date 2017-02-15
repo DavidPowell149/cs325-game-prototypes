@@ -35,7 +35,7 @@ window.onload = function()
     var tempBlood;      // A temp blood cell to add it to the group
 
     // Spikes and blood
-    var spikeSpawnTime = 1000;
+    var spikeSpawnTime = 1500;
     var lastSpikeSpawnTime = 0;
     var bloodSpawnTime = 550;
     var lastBloodSpawnTime = 0;
