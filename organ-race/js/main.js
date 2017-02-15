@@ -109,8 +109,8 @@ window.onload = function()
             lastSpikeSpawnTime = game.time.now;
 
             var rand = Math.random();
-            if(rand > 0.75) {spawnSpike("spike-top");}            // 25% chance of spawning a top spike
-            else if(rand > 0.50) {spawnSpike("spike-bottom");}     // 25% chance of spawning a bottom spike
+            if(rand > 0.80) {spawnSpike("spike-top");}            // 20% chance of spawning a top spike
+            else if(rand > 0.60) {spawnSpike("spike-bottom");}     // 20% chance of spawning a bottom spike
         }
 
         // Spawn blood if allowed
@@ -143,9 +143,9 @@ window.onload = function()
             currentBlood.x -= track_current_speed;
 
             // Check for collision
-            if(currentBlood.overlap(heart))
+            if(currentBlood.overlap(heart) && currentBlood.x < 500)
             {
-                console.log(currentBlood);
+                console.log("Here");
                 score += 10;
                 currentBlood.destroy()
             }
@@ -173,6 +173,7 @@ window.onload = function()
     function spawnBlood()
     {
         tempBlood = game.add.sprite(game.world.width + 50, Math.random()*(game.world.height-150)+75, "blood-cell");
+
         tempBlood.anchor.setTo(0.5, 0.5);
         tempBlood.scale.setTo(0.1, 0.1);
         tempBlood.angle = Math.random()*360;
