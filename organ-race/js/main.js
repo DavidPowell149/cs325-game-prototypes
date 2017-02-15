@@ -150,6 +150,8 @@ window.onload = function()
                 currentBlood.destroy()
             }
 
+            // Rotate blood
+            currentBlood.angle +=1;
         }, this);
     }
 
