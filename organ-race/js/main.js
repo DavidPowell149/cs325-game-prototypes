@@ -21,15 +21,21 @@ window.onload = function()
     var player_current_speed = 0.0; // The player's current speed
     var player_max_speed = 6.0;     // Max speed player can move
 
-    var track_max_speed = 2.0;
-    var track_acceleration = 0.1;
+    var track_current_speed = 3.0;    // Current speed of track
+    var track_max_speed = 7.0;      // Max speed track can move at
+    var track_acceleration = 0.001;   // Track's acceleration rate
 
     var upKey;      // The keys to control the game
     var downKey;
 
     var borderTop; var borderBottom;
+    var spikeGroup;     // A group for the spikes
+    var tempSpike;      // A temp spike to add it to the group
+    var bloodGroup;     // A group for the blood cells
+    var tempBlood;      // A temp blood cell to add it to the group
 
-
+    var spikeSpawnTime = 1000;
+    var lastSpikeSpawnTime = 0;
 
 
     // Pre loads assets for game load
@@ -39,8 +45,8 @@ window.onload = function()
         game.load.image( "heart", 'assets/heart.png' );
         game.load.image( "blood-cell", 'assets/blood_cell.png' );
         game.load.image( "border", 'assets/border.png' );
-        game.load.image( "spike_bottom", 'assets/spike_bottom.png' );
-        game.load.image( "spike_top", 'assets/spike_top.png' );
+        game.load.image( "spike-bottom", 'assets/spike_bottom.png' );
+        game.load.image( "spike-top", 'assets/spike_top.png' );
     }
 
     // Called on game's initial creation state
@@ -55,7 +61,8 @@ window.onload = function()
         borderBottom.anchor.setTo(0, 1.0);  // Set the anchor to the bottom left
         heart.anchor.setTo(0.5, 0.5);   // Sets the reference point to the center of the sprite, not the default top left corner
         heart.scale.setTo(0.3, 0.3);    // Sets the scale of the heart sprite to 30% of its original size
-
+        spikeGroup = game.add.group();  // Group for spikes
+        bloodGroup = game.add.group();  // Group for spikes
 
         // Initialize the keys
         upKey = game.input.keyboard.addKey(Phaser.KeyCode.UP);
@@ -67,10 +74,73 @@ window.onload = function()
     {
         playerMovement()
         boundryCheck();
-
+        updateTrack();
     }
 
 
+    function updateTrack()
+    {
+        //console.log("Speed: " + track_current_speed)
+        if(track_current_speed >= track_max_speed)
+            track_current_speed = track_max_speed;
+        else
+            track_current_speed += track_acceleration;
+
+        if((game.time.now - lastSpikeSpawnTime) > spikeSpawnTime)
+        {
+            lastSpikeSpawnTime = game.time.now;
+
+            var rand = Math.random();
+            if(rand > 0.80) {spawnSpike("spike-top");}            // 15% chance of spawning a top spike
+            else if(rand > 0.60) {spawnSpike("spike-bottom");}     // 15% chance of spawning a bottom spike
+        }
+
+        // Do stuff for each spike
+        spikeGroup.forEach( function(currentSpike)
+        {
+            // Runs for each item in the group
+            currentSpike.x -= track_current_speed;
+
+        }, this);
+    }
+
+    function spawnSpike(spikeType)
+    {
+        console.log("Spawning spike:" + spikeType);
+
+        tempSpike = game.add.sprite(game.world.width + 50, game.world.centerY, spikeType);
+        if(spikeType === "spike-top")
+        {
+            tempSpike.anchor.setTo(0, 0);   // Top left
+            tempSpike.y = borderTop.height - 5;
+        }
+        else if(spikeType === "spike-bottom")
+        {
+            tempSpike.anchor.setTo(0, 1.0); // Bottom left
+            tempSpike.y = game.world.height - borderTop.height + 5;
+        }
+
+        spikeGroup.add(tempSpike);
+    }
+
+    function spawnBlood()
+    {
+        console.log("Spawning blood");
+
+        tempBlood = game.add.sprite(game.world.width + 50, game.world.centerY, spikeType);
+        if(spikeType === "spike-top")
+        {
+            tempSpike.anchor.setTo(0, 0);   // Top left
+            tempSpike.y = borderTop.height - 5;
+        }
+        else if(spikeType === "spike-bottom")
+        {
+            tempSpike.anchor.setTo(0, 1.0); // Bottom left
+            tempSpike.y = game.world.height - borderTop.height + 5;
+        }
+
+        spikeGroup.add(tempSpike);
+    }
 
 
 
