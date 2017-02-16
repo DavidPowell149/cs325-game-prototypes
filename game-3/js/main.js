@@ -15,22 +15,35 @@ window.onload = function()
     "use strict";
 
     // Global variables
-    var game = new Phaser.Game( 980, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var game = new Phaser.Game( 800, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var mainInput;  // The input for the game
 
 
     // Pre loads assets for game load
     function preload()
     {
         // Load in game assets
-        game.load.image( "heart", 'assets/heart.png' );
+        //game.load.image( "heart", 'assets/heart.png' );
+
     }
 
     // Called on game's initial creation state
     function create()
     {
-        // The yellow color background
-        game.stage.backgroundColor = "FFFFCC";
+        game.add.plugin(PhaserInput.Plugin);
 
+
+        var mainInput = game.add.inputField(0, game.world.height - 50, {
+            font: '18px Arial',
+            fill: 'white',
+            fillAlpha: "0",
+            fontWeight: 'bold',
+            width: game.world.width,
+            padding: 8,
+            placeHolder: ">"
+        });
+        mainInput.focusOutOnEnter = false;
+        // mainInput.setText("tst");
 
     }
 
@@ -41,5 +54,6 @@ window.onload = function()
     }
 
 
-    
+
+
 };
