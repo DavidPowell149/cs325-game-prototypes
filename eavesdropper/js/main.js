@@ -15,12 +15,19 @@ window.onload = function()
     "use strict";
 
     // Global variables
-    var game = new Phaser.Game(window.innerWidth*0.9, window.innerHeight*0.9, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var game = new Phaser.Game(window.innerWidth*0.9, window.innerHeight*0.9, Phaser.AUTO, 'game', { preload: preload, create: create, update: update} );
+
+    // Entities
     var player;     // The player's avatar
     var person;
     var personGroup;    // The group for the people
 
-    var saleBar;    // The visual bar
+    // GUI
+    var saleBarOutline;     // The visual bar outline
+    var saleBarFill;        // The visual bar filler
+
+    // Game logic
+    var bonusAmount = 100;
 
     // Pre loads assets for game load
     function preload()
@@ -48,13 +55,23 @@ window.onload = function()
         person.scale.setTo(game.world.width*0.00005, game.world.width*0.00005);
         personGroup = game.add.group();  // Group for spikes
 
-        saleBar = new Phaser.Rectangle(20, 20, 800, 50);
+        // The left bar for the sale bonus bar
+        saleBarOutline = game.add.graphics(0,0);
+        saleBarOutline.lineStyle(1, 0x000000, 1);
+        saleBarOutline.drawRect(0, 0, 30, game.world.height-1);
+        saleBarFill = game.add.graphics(0,0);
+        saleBarFill.beginFill(0x008214);
+        saleBarFill.lineStyle(1, 0x008214, 1);
+        saleBarFill.drawRect(1, game.world.height-1-bonusAmount, 28, game.world.height-1-bonusAmount);
+
+
+
     }
 
     // Runs every tick/iteration/moment/second
     function update()
     {
-
+        
     }
 
 };
