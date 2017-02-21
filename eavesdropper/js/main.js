@@ -27,8 +27,8 @@ window.onload = function()
     {
         // Load in game assets
         game.load.image( "player", 'assets/player.png' );
+        game.load.image( "person", 'assets/person.png' );
 
-        game.load.atlasJSONHash("person", "assets/person/person.png", "assets/person/person.JSON");
     }
 
     // Called on game's initial creation state
@@ -42,14 +42,13 @@ window.onload = function()
         player.anchor.setTo(0.5,0.5);
         player.scale.setTo(game.world.width*0.00007, game.world.width*0.00007);
 
-        // The person
+        // The person and their group
         person = game.add.sprite(game.world.centerX+20, game.world.centerY+20, "person");
+        person.anchor.setTo(0.5,0.5);
         person.scale.setTo(game.world.width*0.00005, game.world.width*0.00005);
-        person.animations.add("person-fade", ["1.png", "2.png", "3.png", "4.png", "5.png"], 10, true, false);
-        person.animations.delay = 100;
-        person.animations.frame = 4;
-        //person.animations.play("person-fade");
         personGroup = game.add.group();  // Group for spikes
+
+        saleBar = new Phaser.Rectangle(20, 20, 800, 50);
     }
 
     // Runs every tick/iteration/moment/second
