@@ -1,6 +1,6 @@
 {"frames": {
 
-"person_1.png":
+"1.png":
 {
 	"frame": {"x":1,"y":1,"w":630,"h":546},
 	"rotated": false,
@@ -8,7 +8,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":630,"h":546},
 	"sourceSize": {"w":630,"h":546}
 },
-"person_2.png":
+"2.png":
 {
 	"frame": {"x":1,"y":549,"w":630,"h":545},
 	"rotated": false,
@@ -16,7 +16,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":630,"h":545},
 	"sourceSize": {"w":630,"h":545}
 },
-"person_3.png":
+"3.png":
 {
 	"frame": {"x":633,"y":549,"w":629,"h":545},
 	"rotated": false,
@@ -24,7 +24,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":629,"h":545},
 	"sourceSize": {"w":629,"h":545}
 },
-"person_4.png":
+"4.png":
 {
 	"frame": {"x":633,"y":1,"w":629,"h":546},
 	"rotated": false,
@@ -32,7 +32,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":629,"h":546},
 	"sourceSize": {"w":629,"h":546}
 },
-"person_5.png":
+"5.png":
 {
 	"frame": {"x":1264,"y":1,"w":629,"h":546},
 	"rotated": false,
