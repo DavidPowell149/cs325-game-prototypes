@@ -23,10 +23,16 @@ window.onload = function()
     var personGroup;    // The group for the people
 
     // GUI
+    var label_currentMoneySum;    // Label for sum of money
+    var label_moneyRate;          // Label for money earning rate
     var saleBarOutline;     // The visual bar outline
     var saleBarFill;        // The visual bar filler
 
+
+
     // Game logic
+    var currentMoneySum=0;    // Money the player currently has in their "pocket"
+    var moneyRate=0;          // Rate at which player earns cash
     var bonusAmount = 500;
     var bonusMax = 1000;
 
@@ -56,12 +62,21 @@ window.onload = function()
         person.scale.setTo(game.world.width*0.00005, game.world.width*0.00005);
         personGroup = game.add.group();  // Group for spikes
 
+
+        //
+        // GUI initiliaiztion
+        //
         // The left bar for the sale bonus bar
         saleBarOutline = game.add.graphics(0,0);
         saleBarOutline.lineStyle(1, 0x000000, 1);
         saleBarOutline.drawRect(0, 0, game.world.width*0.03, game.world.height-1);
-
-
+        // Initialize labels
+        var size_currentMoneySum = Math.min(game.world.width, game.world.height)*0.05;
+        var size_moneyRate = Math.min(game.world.width, game.world.height)*0.025;
+        var style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(size_currentMoneySum)+"px"};
+        label_currentMoneySum = game.add.text(game.world.width*0.04, game.world.height*0.01, "$" + Math.floor(currentMoneySum), style );
+        style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(size_moneyRate)+"px" };
+        label_moneyRate = game.add.text(game.world.width*0.04, game.world.height*0.08, "at $" + Math.floor(moneyRate) + " per sec", style );
 
 
     }
@@ -70,8 +85,18 @@ window.onload = function()
     function update()
     {
         drawSaleBar();
+        updateLabels();
+        currentMoneySum += moneyRate;
+        moneyRate += 0.01;
     }
 
+
+    function updateLabels()
+    {
+        label_currentMoneySum.setText("$" + Math.floor(currentMoneySum));
+        if(moneyRate < 100) { label_moneyRate.setText("at $" + moneyRate.toFixed(2) + " per sec");}
+        else { label_moneyRate.setText("at $" + Math.floor(moneyRate) + " per sec");}
+    }
 
 
     function drawSaleBar()
