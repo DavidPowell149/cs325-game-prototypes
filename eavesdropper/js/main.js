@@ -48,7 +48,7 @@ window.onload = function()
         person.animations.add("person-fade", ["1.png", "2.png", "3.png", "4.png", "5.png"], 10, true, false);
         person.animations.delay = 100;
         person.animations.frame = 4;
-        person.animations.play("person-fade");
+        //person.animations.play("person-fade");
         personGroup = game.add.group();  // Group for spikes
     }
 
