@@ -27,7 +27,8 @@ window.onload = function()
     var saleBarFill;        // The visual bar filler
 
     // Game logic
-    var bonusAmount = 100;
+    var bonusAmount = 500;
+    var bonusMax = 1000;
 
     // Pre loads assets for game load
     function preload()
@@ -58,11 +59,8 @@ window.onload = function()
         // The left bar for the sale bonus bar
         saleBarOutline = game.add.graphics(0,0);
         saleBarOutline.lineStyle(1, 0x000000, 1);
-        saleBarOutline.drawRect(0, 0, 30, game.world.height-1);
-        saleBarFill = game.add.graphics(0,0);
-        saleBarFill.beginFill(0x008214);
-        saleBarFill.lineStyle(1, 0x008214, 1);
-        saleBarFill.drawRect(1, game.world.height-1-bonusAmount, 28, game.world.height-1-bonusAmount);
+        saleBarOutline.drawRect(0, 0, game.world.width*0.03, game.world.height-1);
+
 
 
 
@@ -71,7 +69,17 @@ window.onload = function()
     // Runs every tick/iteration/moment/second
     function update()
     {
-        
+        drawSaleBar();
+    }
+
+
+
+    function drawSaleBar()
+    {
+        saleBarFill = game.add.graphics(0,0);
+        saleBarFill.beginFill(0x008214);
+        saleBarFill.lineStyle(1, 0x008214, 1);
+        saleBarFill.drawRect(1, (game.world.height-1)-(game.world.height*(bonusAmount/bonusMax)), game.world.width*0.03-2, (game.world.height*(bonusAmount/bonusMax)));
     }
 
 };
