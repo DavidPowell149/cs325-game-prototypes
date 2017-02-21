@@ -15,14 +15,16 @@ window.onload = function()
     "use strict";
 
     // Global variables
-    var game = new Phaser.Game( window.innerWidth*0.9, window.innerHeight*0.9, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var game = new Phaser.Game(window.innerWidth*0.9, window.innerHeight*0.9, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
 
 
     // Pre loads assets for game load
     function preload()
     {
         // Load in game assets
-        //game.load.image( "heart", 'assets/heart.png' );
+        game.load.image( "player", 'assets/player.png' );
+
+        game.load.atlasJSONHash("peson", "assets/person/person.png", "assets/person/person.json");
     }
 
     // Called on game's initial creation state
