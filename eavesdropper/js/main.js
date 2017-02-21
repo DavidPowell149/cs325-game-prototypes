@@ -15,7 +15,7 @@ window.onload = function()
     "use strict";
 
     // Global variables
-    var game = new Phaser.Game( 800, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var game = new Phaser.Game( window.innerWidth*0.9, window.innerHeight*0.9, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
 
 
     // Pre loads assets for game load
@@ -23,7 +23,6 @@ window.onload = function()
     {
         // Load in game assets
         //game.load.image( "heart", 'assets/heart.png' );
-
     }
 
     // Called on game's initial creation state
