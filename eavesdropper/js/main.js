@@ -19,8 +19,9 @@ window.onload = function()
 
     // Entities
     var player;     // The player's avatar
-    var person;
+    var tempPerson;
     var personGroup;    // The group for the people
+    var peopleBounds;
 
     // GUI
     var label_currentMoneySum;    // Label for sum of money
@@ -57,10 +58,30 @@ window.onload = function()
         player.scale.setTo(game.world.width*0.00007, game.world.width*0.00007);
 
         // The person and their group
-        person = game.add.sprite(game.world.centerX+20, game.world.centerY+20, "person");
-        person.anchor.setTo(0.5,0.5);
-        person.scale.setTo(game.world.width*0.00005, game.world.width*0.00005);
         personGroup = game.add.group();  // Group for spikes
+        peopleBounds = {x: game.world.width*0.25, y:game.world.height*0.25, width: game.world.width*0.50, height: game.world.height*0.50};  // Area the people should exist in
+        var peopleGridWidth = 10;
+        var peopleGridHeight = 10;
+        var peopleTileSize = Math.min(game.world.width, game.world.height)/peopleGridWidth;
+        var i;
+        for(i=0; i<10; i++)
+        {
+            var c;
+            for(c=0; c<10; c++)
+            {
+                var baseX = peopleBounds.x + (peopleTileSize*c + peopleTileSize/2);
+                var baseY = peopleBounds.y + (peopleTileSize*i + peopleTileSize/2);
+                var x = baseX ;
+                var y = baseY;
+
+                tempPerson = game.add.sprite(x, y, "person");
+                tempPerson.anchor.setTo(0.5,0.5);
+                tempPerson.scale.setTo(game.world.width*0.00005, game.world.width*0.00005);
+                personGroup.add(tempPerson);
+            }
+        }
+
+
 
 
         //
@@ -84,13 +105,14 @@ window.onload = function()
     // Runs every tick/iteration/moment/second
     function update()
     {
-        drawSaleBar();
+        updateBonusBar();
         updateLabels();
         currentMoneySum += moneyRate;
         moneyRate += 0.01;
     }
 
 
+    // Update the text labels to represent the actual values
     function updateLabels()
     {
         label_currentMoneySum.setText("$" + Math.floor(currentMoneySum));
@@ -99,7 +121,8 @@ window.onload = function()
     }
 
 
-    function drawSaleBar()
+    // Update the bonus bar to represent the right values
+    function updateBonusBar()
     {
         saleBarFill = game.add.graphics(0,0);
         saleBarFill.beginFill(0x008214);
