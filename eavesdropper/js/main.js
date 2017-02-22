@@ -324,6 +324,7 @@ window.onload = function()
         person.loadTexture("person");
         if(bonusAmount<10) { bonusAmount += 1; }    // Update bar
         updateBonusBar();
+        person.inputEnabled = false;
     }
 
     function boughtEavesdrop()
