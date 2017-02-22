@@ -229,7 +229,6 @@ window.onload = function()
                 // This code runs for each item in the group
 
                 var conversationChance = Math.random();
-                console.log(conversationChance);
                 if(conversationChance >= 0.995)
                 {
                     person.inputEnabled = true;
