@@ -43,7 +43,6 @@ window.onload = function()
 
     // Game logic
     var currentMoneySum=0;    // Money the player currently has in their "pocket"
-    var moneyRate=0;          // Rate at which player earns cash
     var bonusAmount = 0;
     var bonusMax = 10;
     var moneyUpdateTime = 1000;     // Update every second
@@ -56,7 +55,7 @@ window.onload = function()
     var upgrade_eavesdropPrices =   [100, 500, 2000, 5000, 10000];
     var upgrade_eavesdropValues =   [10, 50, 250, 500, 1000];
     var upgrade_ratePrices =        [10, 100, 200, 1000, 5000];
-    var upgrade_rateValues =        [1, 2, 5, 10, 20];
+    var upgrade_rateValues =        [0, 1, 2, 5, 10, 20];
 
 
     // Pre loads assets for game load
@@ -82,15 +81,12 @@ window.onload = function()
         initializePeople();
         initializeButtons();
         initializeGUI();
-
-
     }
 
     // Runs every tick/iteration/moment/second
     function update()
     {
         updatePeople();
-        updateBonusBar();
         updateLabels();
         updateButtons();
         calculateMoney();
@@ -134,25 +130,27 @@ window.onload = function()
         saleBarOutline = game.add.graphics(0,0);
         saleBarOutline.lineStyle(1, 0x000000, 1);
         saleBarOutline.drawRect(0, 0, game.world.width*0.03, game.world.height-1);
+        saleBarFill = game.add.graphics(0,0);
         // Initialize money labels
         var size_currentMoneySum = Math.min(game.world.width, game.world.height)*0.05;
         var size_moneyRate = Math.min(game.world.width, game.world.height)*0.025;
         var style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(size_currentMoneySum)+"px"};
         label_currentMoneySum = game.add.text(game.world.width*0.04, game.world.height*0.01, "$" + Math.floor(currentMoneySum), style );
         style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(size_moneyRate)+"px" };
-        label_moneyRate = game.add.text(game.world.width*0.04, game.world.height*0.08, "at $" + Math.floor(moneyRate) + " per sec", style );
+        label_moneyRate = game.add.text(game.world.width*0.04, game.world.height*0.08, "at $" + Math.floor(upgrade_rateValues[0]) + " per sec", style );
 
         // Initialize button labels
-        var size_buttonHeader = Math.min(game.world.width, game.world.height)*0.024;
-        var size_buttonDetail = Math.min(game.world.width, game.world.height)*0.04;
+        var size_buttonHeader = Math.min(game.world.width, game.world.height)*0.023;
+        var size_buttonDetail = Math.min(game.world.width, game.world.height)*0.036;
         var style = { font: "Verdana", fill: "#FFFFFF", align: "left", fontSize: String(size_buttonHeader)+"px", wordWrap: true, wordWrapWidth: button_eavesdropAmount.width};
-        label_eavesdropHeader = game.add.text(button_eavesdropAmount.x+game.world.width*0.01, button_eavesdropAmount.y+game.world.height*0.01, "Increase conversation price", style );
+        label_eavesdropHeader = game.add.text(button_eavesdropAmount.x+game.world.width*0.01, button_eavesdropAmount.y+game.world.height*0.01, "Increase conversation profit", style );
         label_rateHeader =      game.add.text(button_moneyRate.x+game.world.width*0.01, button_moneyRate.y+game.world.height*0.01, "Increase $ per sec", style );
         label_sellHeader =      game.add.text(button_sellBonus.x+game.world.width*0.01, button_sellBonus.y+game.world.height*0.01, "Sell conversation", style );
         style = { font: "Verdana", fill: "#FFFFFF", align: "left", fontSize: String(size_buttonDetail)+"px", wordWrap: true, wordWrapWidth: button_eavesdropAmount.width*3/4};
-        label_eavesdropDetail = game.add.text(button_eavesdropAmount.x+button_eavesdropAmount.width-game.world.width*0.05, button_eavesdropAmount.y+button_eavesdropAmount.height-game.world.height*0.07, "$" + "0", style );
-        label_rateDetail      = game.add.text(button_moneyRate.x+button_moneyRate.width-game.world.width*0.05, button_moneyRate.y+button_moneyRate.height-game.world.height*0.07, "$" + "0", style );
-        label_sellDetail      = game.add.text(button_sellBonus.x+button_sellBonus.width-game.world.width*0.09, button_sellBonus.y+button_sellBonus.height-game.world.height*0.07, "Gain $" + "0" , style );
+        label_eavesdropDetail = game.add.text(button_eavesdropAmount.x+button_eavesdropAmount.width*0.1, button_eavesdropAmount.y+button_eavesdropAmount.height-button_eavesdropAmount.height*0.4, "$" + "0", style );
+        label_rateDetail      = game.add.text(button_moneyRate.x+button_moneyRate.width*0.1, button_moneyRate.y+button_moneyRate.height-button_moneyRate.height*0.4, "$" + "0", style );
+        label_sellDetail      = game.add.text(button_sellBonus.x+button_sellBonus.width*0.1, button_sellBonus.y+button_sellBonus.height-button_sellBonus.height*0.4, "Gain $" + "0" , style );
+
 
         // Hint
         style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(Math.min(game.world.width, game.world.height)*0.02)+"px", wordWrap: true, wordWrapWidth: game.world.width*0.15};
@@ -168,31 +166,30 @@ window.onload = function()
         button_eavesdropAmount.beginFill(0x404040);
         button_eavesdropAmount.lineStyle(1, 0x000000, 1);
         button_eavesdropAmount.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
-        button_eavesdropAmount.inputEnabled = true;
+        button_eavesdropAmount.inputEnabled = false;
         button_eavesdropAmount.events.onInputUp.add(boughtEavesdrop, this);
         button_moneyRate = game.add.graphics(game.world.centerX-(game.world.width*0.17)/2, game.world.height-(game.world.height*0.15)-2);
         button_moneyRate.beginFill(0x404040);
         button_moneyRate.lineStyle(1, 0x000000, 1);
         button_moneyRate.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
-        button_eavesdropAmount.inputEnabled = true;
-        button_eavesdropAmount.events.onInputUp.add(boughtRate, this);
+        button_moneyRate.inputEnabled = false;
+        button_moneyRate.events.onInputUp.add(boughtRate, this);
         button_sellBonus = game.add.graphics(game.world.width*0.63, game.world.height-(game.world.height*0.15)-2);
         button_sellBonus.beginFill(0x404040);
         button_sellBonus.lineStyle(1, 0x000000, 1);
         button_sellBonus.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
-        button_eavesdropAmount.inputEnabled = true;
-        button_eavesdropAmount.events.onInputUp.add(soldBonus, this);
+        button_sellBonus.inputEnabled = false;
+        button_sellBonus.events.onInputUp.add(soldBonus, this);
     }
 
 
     // Calculates the money the player has earned this update cycle
     function calculateMoney()
     {
-        // Spawn spikes if allowed
         if((game.time.now - lasyMoneyUpdate) > moneyUpdateTime)
         {
             lasyMoneyUpdate = game.time.now;
-            currentMoneySum += moneyRate;
+            currentMoneySum += upgrade_rateValues[0];
         }
     }
 
@@ -200,7 +197,7 @@ window.onload = function()
     // Updates the people and their state
     function updatePeople()
     {
-        if((game.time.now - lastPeopleUpdate) > peopleUpdateTime)
+        if((game.time.now - lastPeopleUpdate) > 1000)//peopleUpdateTime)
         {
             lastPeopleUpdate = game.time.now;
 
@@ -233,15 +230,16 @@ window.onload = function()
     function updateLabels()
     {
         label_currentMoneySum.setText("$" + Math.floor(currentMoneySum));
-        if(moneyRate < 100) { label_moneyRate.setText("at $" + moneyRate.toFixed(2) + " per sec");}
-        else { label_moneyRate.setText("at $" + Math.floor(moneyRate) + " per sec");}
+        if(upgrade_rateValues[0] < 100) { label_moneyRate.setText("at $" + upgrade_rateValues[0].toFixed(2) + " per sec");}
+        else { label_moneyRate.setText("at $" + Math.floor(upgrade_rateValues[0]) + " per sec");}
     }
 
 
     // Update the bonus bar to represent the right values
     function updateBonusBar()
     {
-        saleBarFill = game.add.graphics(0,0);
+        console.log(bonusAmount);
+        saleBarFill.clear();    // Clear it so we can redraw
         saleBarFill.beginFill(0x008214);
         saleBarFill.lineStyle(1, 0x008214, 1);
         saleBarFill.drawRect(1, (game.world.height-1)-(game.world.height*(bonusAmount/bonusMax)), game.world.width*0.03-2, (game.world.height*(bonusAmount/bonusMax)));
@@ -260,6 +258,17 @@ window.onload = function()
             // Color button and text
             // Remove clickability
         }
+
+        if(bonusAmount == bonusMax)   // Allowed to sell
+        {
+            // Color button and text
+            button_sellBonus.inputEnabled = true;   // Give clickability
+        }
+        else    // Not enough money
+        {
+            // Color button and text
+            button_sellBonus.inputEnabled = false;  // Remove clickability
+        }
     }
 
     // Runs when a person is legally clicked
@@ -267,6 +276,7 @@ window.onload = function()
     {
         person.loadTexture("person");
         if(bonusAmount<10) { bonusAmount += 1; }    // Update bar
+        updateBonusBar();
     }
 
     function boughtEavesdrop()
@@ -281,7 +291,10 @@ window.onload = function()
 
     function soldBonus()
     {
-        console.log("Sold Bonus");
+        console.log("Sold conversation");
+        bonusAmount = 0;    // Reset bonus amount
+        currentMoneySum += upgrade_eavesdropValues[0];  // Grab value from current eavesdrop value
+        saleBarFill.clear();// Redraw
     }
 
 
