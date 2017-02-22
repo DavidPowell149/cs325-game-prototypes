@@ -29,13 +29,29 @@ window.onload = function()
     var saleBarOutline;     // The visual bar outline
     var saleBarFill;        // The visual bar filler
 
+    var button_eavesdropAmount; // The first button option
+    var button_moneyRate;       // The second button option
+    var button_sellBonus;       // Selling the bonus bar
+    var label_eavesdropButton;    // Label for sum of money
+    var label_rateButton;          // Label for money earning rate
+    var label_sellButton;          // Label for money earning rate
 
 
     // Game logic
     var currentMoneySum=0;    // Money the player currently has in their "pocket"
     var moneyRate=0;          // Rate at which player earns cash
-    var bonusAmount = 500;
-    var bonusMax = 1000;
+    var bonusAmount = 1;
+    var bonusMax = 10;
+    var moneyUpdateTime = 1000;     // Update every second
+    var lasyMoneyUpdate = 0;
+
+
+    // Upgrade data
+    var upgrade_eavesdropPrices =   [100, 500, 2000, 5000, 10000];
+    var upgrade_eavesdropValues =   [10, 50, 250, 500, 1000];
+    var upgrade_ratePrices =        [10, 100, 200, 1000, 5000];
+    var upgrade_rateValues =        [1, 2, 5, 10, 20];
+
 
     // Pre loads assets for game load
     function preload()
@@ -57,31 +73,35 @@ window.onload = function()
         player.anchor.setTo(0.5,0.5);
         player.scale.setTo(game.world.width*0.00007, game.world.width*0.00007);
 
-        // The person and their group
+        // The crowd
         personGroup = game.add.group();  // Group for spikes
-        peopleBounds = {x: game.world.width*0.25, y:game.world.height*0.25, width: game.world.width*0.50, height: game.world.height*0.50};  // Area the people should exist in
-        var peopleGridWidth = 10;
-        var peopleGridHeight = 10;
-        var peopleTileSize = Math.min(game.world.width, game.world.height)/peopleGridWidth;
-        var i;
-        for(i=0; i<10; i++)
+        peopleBounds = {x: game.world.width*0.20, y:game.world.height*0.20, width: game.world.width*0.60, height: game.world.height*0.60};  // Area the people should exist in
+        var peopleGridWidth = 11;
+        var peopleGridHeight = 11;
+        var peopleTileWidth = peopleBounds.width/peopleGridWidth;
+        var peopleTileHeight = peopleBounds.height/peopleGridHeight;
+        var c;
+        for(c=0; c<peopleGridHeight; c++)
         {
-            var c;
-            for(c=0; c<10; c++)
+            var r;
+            for(r=0; r<peopleGridWidth; r++)
             {
-                var baseX = peopleBounds.x + (peopleTileSize*c + peopleTileSize/2);
-                var baseY = peopleBounds.y + (peopleTileSize*i + peopleTileSize/2);
-                var x = baseX ;
-                var y = baseY;
+                var baseX = peopleBounds.x + (peopleTileWidth*r) + peopleTileWidth/2;
+                var baseY = peopleBounds.y + (peopleTileHeight*c) + peopleTileHeight/2;
+                var x = baseX + Math.random()*peopleTileWidth-(peopleTileWidth/2) ;
+                var y = baseY + Math.random()*peopleTileHeight-(peopleTileHeight/2);
 
                 tempPerson = game.add.sprite(x, y, "person");
                 tempPerson.anchor.setTo(0.5,0.5);
-                tempPerson.scale.setTo(game.world.width*0.00005, game.world.width*0.00005);
+                var personSize = Math.min(peopleTileWidth,peopleTileHeight)*0.0014;
+                tempPerson.scale.setTo(personSize, personSize);
                 personGroup.add(tempPerson);
             }
         }
 
-
+        var ts = game.add.graphics(0,0);
+        ts.lineStyle(1, 0x000000, 1);
+        //ts.drawRect(peopleBounds.x, peopleBounds.y, peopleBounds.width, peopleBounds.height);
 
 
         //
@@ -100,6 +120,25 @@ window.onload = function()
         label_moneyRate = game.add.text(game.world.width*0.04, game.world.height*0.08, "at $" + Math.floor(moneyRate) + " per sec", style );
 
 
+        // Buttons
+        button_eavesdropAmount = game.add.graphics(0,0);
+        button_eavesdropAmount.beginFill(0x404040);
+        button_eavesdropAmount.lineStyle(1, 0x000000, 1);
+        button_eavesdropAmount.drawRect(game.world.width*0.85-1, game.world.height*0.10, game.world.width*0.15, game.world.height*0.1);
+        button_eavesdropAmount.inputEnabled = true;
+        button_eavesdropAmount.events.onInputUp.add(boughtEavesdrop, this);
+        button_moneyRate = game.add.graphics(0,0);
+        button_moneyRate.beginFill(0x404040);
+        button_moneyRate.lineStyle(1, 0x000000, 1);
+        button_moneyRate.drawRect(game.world.width*0.85-1, game.world.height*0.21, game.world.width*0.15, game.world.height*0.1);
+        button_eavesdropAmount.inputEnabled = true;
+        button_eavesdropAmount.events.onInputUp.add(boughtRate, this);
+        button_sellBonus = game.add.graphics(0,0);
+        button_sellBonus.beginFill(0x404040);
+        button_sellBonus.lineStyle(1, 0x000000, 1);
+        button_sellBonus.drawRect(game.world.width*0.85-1, game.world.height*0.32, game.world.width*0.15, game.world.height*0.1);
+        button_eavesdropAmount.inputEnabled = true;
+        button_eavesdropAmount.events.onInputUp.add(soldBonus, this);
     }
 
     // Runs every tick/iteration/moment/second
@@ -107,8 +146,20 @@ window.onload = function()
     {
         updateBonusBar();
         updateLabels();
-        currentMoneySum += moneyRate;
-        moneyRate += 0.01;
+        updateButtons();
+        calculateMoney();
+    }
+
+    // Calculates the money the player has earned this update cycle
+    function calculateMoney()
+    {
+        // Spawn spikes if allowed
+        if((game.time.now - lasyMoneyUpdate) > moneyUpdateTime)
+        {
+            lasyMoneyUpdate = game.time.now;
+            currentMoneySum += moneyRate;
+        }
+
     }
 
 
@@ -128,6 +179,28 @@ window.onload = function()
         saleBarFill.beginFill(0x008214);
         saleBarFill.lineStyle(1, 0x008214, 1);
         saleBarFill.drawRect(1, (game.world.height-1)-(game.world.height*(bonusAmount/bonusMax)), game.world.width*0.03-2, (game.world.height*(bonusAmount/bonusMax)));
+    }
+
+    // Adjusts button state and appearance
+    function updateButtons()
+    {
+
+    }
+
+
+    function boughtEavesdrop()
+    {
+        console.log("Bought eavesdrop");
+    }
+
+    function boughtRate()
+    {
+        console.log("Bought rate increase");
+    }
+
+    function soldBonus()
+    {
+        console.log("Sold Bonus");
     }
 
 };
