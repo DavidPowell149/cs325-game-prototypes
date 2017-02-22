@@ -44,6 +44,8 @@ window.onload = function()
     var bonusMax = 10;
     var moneyUpdateTime = 1000;     // Update every second
     var lasyMoneyUpdate = 0;
+    var peopleUpdateTime = 7000;     // Update every 7 seconds
+    var lastPeopleUpdate = 0;
 
 
     // Upgrade data
@@ -59,7 +61,7 @@ window.onload = function()
         // Load in game assets
         game.load.image( "player", 'assets/player.png' );
         game.load.image( "person", 'assets/person.png' );
-
+        game.load.image( "person_red", 'assets/person_red.png' );
     }
 
     // Called on game's initial creation state
@@ -73,6 +75,25 @@ window.onload = function()
         player.anchor.setTo(0.5,0.5);
         player.scale.setTo(game.world.width*0.00007, game.world.width*0.00007);
 
+        initializePeople();
+
+        initializeGUI();
+
+        initializeButtons();
+    }
+
+    // Runs every tick/iteration/moment/second
+    function update()
+    {
+        updatePeople();
+        updateBonusBar();
+        updateLabels();
+        updateButtons();
+        calculateMoney();
+    }
+
+    function initializePeople()
+    {
         // The crowd
         personGroup = game.add.group();  // Group for spikes
         peopleBounds = {x: game.world.width*0.20, y:game.world.height*0.20, width: game.world.width*0.60, height: game.world.height*0.60};  // Area the people should exist in
@@ -98,12 +119,10 @@ window.onload = function()
                 personGroup.add(tempPerson);
             }
         }
+    }
 
-        var ts = game.add.graphics(0,0);
-        ts.lineStyle(1, 0x000000, 1);
-        //ts.drawRect(peopleBounds.x, peopleBounds.y, peopleBounds.width, peopleBounds.height);
-
-
+    function initializeGUI()
+    {
         //
         // GUI initiliaiztion
         //
@@ -119,7 +138,10 @@ window.onload = function()
         style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(size_moneyRate)+"px" };
         label_moneyRate = game.add.text(game.world.width*0.04, game.world.height*0.08, "at $" + Math.floor(moneyRate) + " per sec", style );
 
+    }
 
+    function initializeButtons()
+    {
         // Buttons
         button_eavesdropAmount = game.add.graphics(0,0);
         button_eavesdropAmount.beginFill(0x404040);
@@ -141,14 +163,6 @@ window.onload = function()
         button_eavesdropAmount.events.onInputUp.add(soldBonus, this);
     }
 
-    // Runs every tick/iteration/moment/second
-    function update()
-    {
-        updateBonusBar();
-        updateLabels();
-        updateButtons();
-        calculateMoney();
-    }
 
     // Calculates the money the player has earned this update cycle
     function calculateMoney()
@@ -162,6 +176,44 @@ window.onload = function()
 
     }
 
+
+    // Updates the people and their state
+    function updatePeople()
+    {
+        if((game.time.now - lastPeopleUpdate) > peopleUpdateTime)
+        {
+            lastPeopleUpdate = game.time.now;
+
+            // Do stuff for each person
+            personGroup.forEach( function(person)
+            {
+                // This code runs for each item in the group
+
+                var conversationChance = Math.random();
+                if(conversationChance >= 0.99)
+                {
+                    person.inputEnabled = true;
+                    person.loadTexture("person_red");
+                }
+
+
+            }, this);
+
+        }
+
+        // Do stuff for each person
+        personGroup.forEach( function(person)
+        {
+            // This code runs for each item in the group
+            // Check if clicked
+            person.events.onInputUp.add(personClicked, this, person);
+        }, this);
+
+
+
+
+
+    }
 
     // Update the text labels to represent the actual values
     function updateLabels()
@@ -184,9 +236,15 @@ window.onload = function()
     // Adjusts button state and appearance
     function updateButtons()
     {
-
+        
     }
 
+    // Runs when a person is legally clicked
+    function personClicked(person)
+    {
+        person.loadTexture("person");
+        if(bonusAmount<10) { bonusAmount += 1; }    // Update bar
+    }
 
     function boughtEavesdrop()
     {
