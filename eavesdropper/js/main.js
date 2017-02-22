@@ -32,9 +32,12 @@ window.onload = function()
     var button_eavesdropAmount; // The first button option
     var button_moneyRate;       // The second button option
     var button_sellBonus;       // Selling the bonus bar
-    var label_eavesdropButton;    // Label for sum of money
-    var label_rateButton;          // Label for money earning rate
-    var label_sellButton;          // Label for money earning rate
+    var label_eavesdropHeader;    // Label for sum of money
+    var label_eavesdropDetail;
+    var label_rateHeader;          // Label for money earning rate
+    var label_rateDetail;
+    var label_sellHeader;          // Label for money earning rate
+    var label_sellDetail;
 
 
     // Game logic
@@ -76,10 +79,10 @@ window.onload = function()
         player.scale.setTo(game.world.width*0.00007, game.world.width*0.00007);
 
         initializePeople();
-
+        initializeButtons();
         initializeGUI();
 
-        initializeButtons();
+
     }
 
     // Runs every tick/iteration/moment/second
@@ -130,7 +133,7 @@ window.onload = function()
         saleBarOutline = game.add.graphics(0,0);
         saleBarOutline.lineStyle(1, 0x000000, 1);
         saleBarOutline.drawRect(0, 0, game.world.width*0.03, game.world.height-1);
-        // Initialize labels
+        // Initialize money labels
         var size_currentMoneySum = Math.min(game.world.width, game.world.height)*0.05;
         var size_moneyRate = Math.min(game.world.width, game.world.height)*0.025;
         var style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(size_currentMoneySum)+"px"};
@@ -138,27 +141,39 @@ window.onload = function()
         style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(size_moneyRate)+"px" };
         label_moneyRate = game.add.text(game.world.width*0.04, game.world.height*0.08, "at $" + Math.floor(moneyRate) + " per sec", style );
 
+        // Initialize button labels
+        var size_buttonHeader = Math.min(game.world.width, game.world.height)*0.024;
+        var size_buttonDetail = Math.min(game.world.width, game.world.height)*0.04;
+        var style = { font: "Verdana", fill: "#FFFFFF", align: "left", fontSize: String(size_buttonHeader)+"px", wordWrap: true, wordWrapWidth: button_eavesdropAmount.width};
+        label_eavesdropHeader = game.add.text(button_eavesdropAmount.x+game.world.width*0.01, button_eavesdropAmount.y+game.world.height*0.01, "Increase conversation price", style );
+        label_rateHeader =      game.add.text(button_moneyRate.x+game.world.width*0.01, button_moneyRate.y+game.world.height*0.01, "Increase $ per sec", style );
+        label_sellHeader =      game.add.text(button_sellBonus.x+game.world.width*0.01, button_sellBonus.y+game.world.height*0.01, "Sell conversation", style );
+        style = { font: "Verdana", fill: "#FFFFFF", align: "left", fontSize: String(size_buttonDetail)+"px", wordWrap: true, wordWrapWidth: button_eavesdropAmount.width*3/4};
+        label_eavesdropDetail = game.add.text(button_eavesdropAmount.x+button_eavesdropAmount.width-game.world.width*0.05, button_eavesdropAmount.y+button_eavesdropAmount.height-game.world.height*0.07, "$" + "0", style );
+        label_rateDetail      = game.add.text(button_moneyRate.x+button_moneyRate.width-game.world.width*0.05, button_moneyRate.y+button_moneyRate.height-game.world.height*0.07, "$" + "0", style );
+        label_sellDetail      = game.add.text(button_sellBonus.x+button_sellBonus.width-game.world.width*0.09, button_sellBonus.y+button_sellBonus.height-game.world.height*0.07, "Gain $" + "0" , style );
+
     }
 
     function initializeButtons()
     {
         // Buttons
-        button_eavesdropAmount = game.add.graphics(0,0);
+        button_eavesdropAmount = game.add.graphics(game.world.width*0.20, game.world.height-(game.world.height*0.15)-2);
         button_eavesdropAmount.beginFill(0x404040);
         button_eavesdropAmount.lineStyle(1, 0x000000, 1);
-        button_eavesdropAmount.drawRect(game.world.width*0.85-1, game.world.height*0.10, game.world.width*0.15, game.world.height*0.1);
+        button_eavesdropAmount.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
         button_eavesdropAmount.inputEnabled = true;
         button_eavesdropAmount.events.onInputUp.add(boughtEavesdrop, this);
-        button_moneyRate = game.add.graphics(0,0);
+        button_moneyRate = game.add.graphics(game.world.centerX-(game.world.width*0.17)/2, game.world.height-(game.world.height*0.15)-2);
         button_moneyRate.beginFill(0x404040);
         button_moneyRate.lineStyle(1, 0x000000, 1);
-        button_moneyRate.drawRect(game.world.width*0.85-1, game.world.height*0.21, game.world.width*0.15, game.world.height*0.1);
+        button_moneyRate.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
         button_eavesdropAmount.inputEnabled = true;
         button_eavesdropAmount.events.onInputUp.add(boughtRate, this);
-        button_sellBonus = game.add.graphics(0,0);
+        button_sellBonus = game.add.graphics(game.world.width*0.63, game.world.height-(game.world.height*0.15)-2);
         button_sellBonus.beginFill(0x404040);
         button_sellBonus.lineStyle(1, 0x000000, 1);
-        button_sellBonus.drawRect(game.world.width*0.85-1, game.world.height*0.32, game.world.width*0.15, game.world.height*0.1);
+        button_sellBonus.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
         button_eavesdropAmount.inputEnabled = true;
         button_eavesdropAmount.events.onInputUp.add(soldBonus, this);
     }
@@ -196,9 +211,7 @@ window.onload = function()
                     person.loadTexture("person_red");
                 }
 
-
             }, this);
-
         }
 
         // Do stuff for each person
@@ -208,10 +221,6 @@ window.onload = function()
             // Check if clicked
             person.events.onInputUp.add(personClicked, this, person);
         }, this);
-
-
-
-
 
     }
 
@@ -236,7 +245,7 @@ window.onload = function()
     // Adjusts button state and appearance
     function updateButtons()
     {
-        
+
     }
 
     // Runs when a person is legally clicked
