@@ -39,11 +39,12 @@ window.onload = function()
     var label_sellHeader;          // Label for money earning rate
     var label_sellDetail;
 
+    var hintText;       // The instructions
 
     // Game logic
     var currentMoneySum=0;    // Money the player currently has in their "pocket"
     var moneyRate=0;          // Rate at which player earns cash
-    var bonusAmount = 1;
+    var bonusAmount = 0;
     var bonusMax = 10;
     var moneyUpdateTime = 1000;     // Update every second
     var lasyMoneyUpdate = 0;
@@ -153,6 +154,11 @@ window.onload = function()
         label_rateDetail      = game.add.text(button_moneyRate.x+button_moneyRate.width-game.world.width*0.05, button_moneyRate.y+button_moneyRate.height-game.world.height*0.07, "$" + "0", style );
         label_sellDetail      = game.add.text(button_sellBonus.x+button_sellBonus.width-game.world.width*0.09, button_sellBonus.y+button_sellBonus.height-game.world.height*0.07, "Gain $" + "0" , style );
 
+        // Hint
+        style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(Math.min(game.world.width, game.world.height)*0.02)+"px", wordWrap: true, wordWrapWidth: game.world.width*0.15};
+        hintText = game.add.text(game.world.width*0.85, game.world.height*0.02, "1. Click on red people to eavesdrop on bits of a conversation.\n2. Sell a full conversation for profit.\n\nClick to hide instructions.", style );
+        hintText.inputEnabled = true;
+        hintText.events.onInputUp.add(removeHint, this);
     }
 
     function initializeButtons()
@@ -188,7 +194,6 @@ window.onload = function()
             lasyMoneyUpdate = game.time.now;
             currentMoneySum += moneyRate;
         }
-
     }
 
 
@@ -245,7 +250,16 @@ window.onload = function()
     // Adjusts button state and appearance
     function updateButtons()
     {
-
+        if(currentMoneySum >= upgrade_eavesdropPrices[0])   // Enough money
+        {
+            // Color button and text
+            // Give clickability
+        }
+        else    // Not enough money
+        {
+            // Color button and text
+            // Remove clickability
+        }
     }
 
     // Runs when a person is legally clicked
@@ -270,4 +284,9 @@ window.onload = function()
         console.log("Sold Bonus");
     }
 
+
+    function removeHint()
+    {
+        hintText.destroy();
+    }
 };
