@@ -53,7 +53,7 @@ window.onload = function()
     var bonusMax = 10;
     var moneyUpdateTime = 1000;     // Update every second
     var lasyMoneyUpdate = 0;
-    var peopleUpdateTime = 7000;     // Update every 7 seconds
+    var peopleUpdateTime = 1000;     // Update every second
     var lastPeopleUpdate = 0;
 
 
@@ -92,6 +92,7 @@ window.onload = function()
 
         audio_crowd = game.add.audio('crowd');
         audio_crowd.loop = true;
+        audio_crowd.volume= 0.8;
         audio_crowd.play();
         audio_coin = game.add.audio('coin');
         audio_upgrade = game.add.audio('upgrade');
@@ -228,7 +229,8 @@ window.onload = function()
                 // This code runs for each item in the group
 
                 var conversationChance = Math.random();
-                if(conversationChance >= 0.99)
+                console.log(conversationChance);
+                if(conversationChance >= 0.995)
                 {
                     person.inputEnabled = true;
                     person.loadTexture("person_red");
