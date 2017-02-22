@@ -42,7 +42,7 @@ window.onload = function()
     var hintText;       // The instructions
 
     // Game logic
-    var currentMoneySum=1000;    // Money the player currently has in their "pocket"
+    var currentMoneySum=0;    // Money the player currently has in their "pocket"
     var bonusAmount = 0;
     var bonusMax = 10;
     var moneyUpdateTime = 1000;     // Update every second
@@ -52,8 +52,8 @@ window.onload = function()
 
 
     // Upgrade data
-    var upgrade_eavesdropPrices =   [100, 500, 2000, 5000, 10000];
-    var upgrade_eavesdropValues =   [10, 25, 50, 150, 200];
+    var upgrade_eavesdropPrices =       [50, 200, 500, 1000, 5000];
+    var upgrade_eavesdropValues =   [10, 25, 50, 100, 200, 400];
     var upgrade_ratePrices =        [10, 100, 200, 1000, 5000];
     var upgrade_rateValues =        [0, 1, 2, 5, 10, 20];
 
@@ -197,7 +197,7 @@ window.onload = function()
     // Updates the people and their state
     function updatePeople()
     {
-        if((game.time.now - lastPeopleUpdate) > 1000)//peopleUpdateTime)
+        if((game.time.now - lastPeopleUpdate) > peopleUpdateTime)
         {
             lastPeopleUpdate = game.time.now;
 
@@ -316,6 +316,20 @@ window.onload = function()
             label_sellDetail.addColor("#F2F2F2", 0);    // Color detail text
             button_sellBonus.inputEnabled = false;      // Remove clickability
         }
+
+        // Check if upgrade path is done. If it is, kill the button
+        if(upgrade_eavesdropPrices.length == 0)
+        {
+            button_eavesdropAmount.clear();
+            label_eavesdropHeader.destroy();
+            label_eavesdropDetail.destroy();
+        }
+        if(upgrade_ratePrices.length == 0)
+        {
+            button_moneyRate.clear();
+            label_rateHeader.destroy();
+            label_rateDetail.destroy();
+        }
     }
 
     // Runs when a person is legally clicked
@@ -333,7 +347,6 @@ window.onload = function()
         currentMoneySum -= upgrade_eavesdropPrices[0];
         upgrade_eavesdropValues.shift();     // Shift so the rate is a new rate
         upgrade_eavesdropPrices.shift();     // Shift so the price is now more
-
     }
 
     function boughtRate()
