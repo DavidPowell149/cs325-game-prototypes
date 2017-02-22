@@ -23,6 +23,12 @@ window.onload = function()
     var personGroup;    // The group for the people
     var peopleBounds;
 
+    // Audio
+    var audio_crowd;
+    var audio_coin;
+    var audio_upgrade;
+    var audio_gather;
+
     // GUI
     var label_currentMoneySum;    // Label for sum of money
     var label_moneyRate;          // Label for money earning rate
@@ -42,7 +48,7 @@ window.onload = function()
     var hintText;       // The instructions
 
     // Game logic
-    var currentMoneySum=0;    // Money the player currently has in their "pocket"
+    var currentMoneySum=10;    // Money the player currently has in their "pocket"
     var bonusAmount = 0;
     var bonusMax = 10;
     var moneyUpdateTime = 1000;     // Update every second
@@ -65,6 +71,12 @@ window.onload = function()
         game.load.image( "player", 'assets/player.png' );
         game.load.image( "person", 'assets/person.png' );
         game.load.image( "person_red", 'assets/person_red.png' );
+        // Audio
+        game.load.audio( "crowd", 'assets/audio/crowd.wav');
+        game.load.audio( "coin", 'assets/audio/coin.mp3');
+        game.load.audio( "upgrade", 'assets/audio/upgrade.wav');
+        game.load.audio( "gather", 'assets/audio/gather.wav');
+
     }
 
     // Called on game's initial creation state
@@ -77,6 +89,15 @@ window.onload = function()
         player = game.add.sprite(game.world.centerX, game.world.centerY, "player");
         player.anchor.setTo(0.5,0.5);
         player.scale.setTo(game.world.width*0.00007, game.world.width*0.00007);
+
+        audio_crowd = game.add.audio('crowd');
+        audio_crowd.loop = true;
+        audio_crowd.play();
+        audio_coin = game.add.audio('coin');
+        audio_upgrade = game.add.audio('upgrade');
+        audio_upgrade.volume= 0.3;
+        audio_gather = game.add.audio('gather');
+
 
         initializePeople();
         initializeButtons();
@@ -339,6 +360,7 @@ window.onload = function()
         if(bonusAmount<10) { bonusAmount += 1; }    // Update bar
         updateBonusBar();
         person.inputEnabled = false;
+        audio_gather.play();
     }
 
     function boughtEavesdrop()
@@ -347,6 +369,7 @@ window.onload = function()
         currentMoneySum -= upgrade_eavesdropPrices[0];
         upgrade_eavesdropValues.shift();     // Shift so the rate is a new rate
         upgrade_eavesdropPrices.shift();     // Shift so the price is now more
+        audio_upgrade.play();
     }
 
     function boughtRate()
@@ -355,6 +378,7 @@ window.onload = function()
         currentMoneySum -= upgrade_ratePrices[0];
         upgrade_rateValues.shift();     // Shift so the rate is a new rate
         upgrade_ratePrices.shift();     // Shift so the price is now more
+        audio_upgrade.play();
     }
 
     function soldBonus()
@@ -363,6 +387,7 @@ window.onload = function()
         bonusAmount = 0;    // Reset bonus amount
         currentMoneySum += upgrade_eavesdropValues[0];  // Grab value from current eavesdrop value
         saleBarFill.clear();// Redraw
+        audio_coin.play();
     }
 
 
