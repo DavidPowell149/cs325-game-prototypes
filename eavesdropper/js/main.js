@@ -42,7 +42,7 @@ window.onload = function()
     var hintText;       // The instructions
 
     // Game logic
-    var currentMoneySum=0;    // Money the player currently has in their "pocket"
+    var currentMoneySum=1000;    // Money the player currently has in their "pocket"
     var bonusAmount = 0;
     var bonusMax = 10;
     var moneyUpdateTime = 1000;     // Update every second
@@ -53,7 +53,7 @@ window.onload = function()
 
     // Upgrade data
     var upgrade_eavesdropPrices =   [100, 500, 2000, 5000, 10000];
-    var upgrade_eavesdropValues =   [10, 50, 250, 500, 1000];
+    var upgrade_eavesdropValues =   [10, 25, 50, 150, 200];
     var upgrade_ratePrices =        [10, 100, 200, 1000, 5000];
     var upgrade_rateValues =        [0, 1, 2, 5, 10, 20];
 
@@ -147,9 +147,9 @@ window.onload = function()
         label_rateHeader =      game.add.text(button_moneyRate.x+game.world.width*0.01, button_moneyRate.y+game.world.height*0.01, "Increase $ per sec", style );
         label_sellHeader =      game.add.text(button_sellBonus.x+game.world.width*0.01, button_sellBonus.y+game.world.height*0.01, "Sell conversation", style );
         style = { font: "Verdana", fill: "#F2F2F2", align: "left", fontSize: String(size_buttonDetail)+"px", wordWrap: true, wordWrapWidth: button_eavesdropAmount.width*3/4};
-        label_eavesdropDetail = game.add.text(button_eavesdropAmount.x+button_eavesdropAmount.width*0.1, button_eavesdropAmount.y+button_eavesdropAmount.height-button_eavesdropAmount.height*0.4, "$" + "0", style );
-        label_rateDetail      = game.add.text(button_moneyRate.x+button_moneyRate.width*0.1, button_moneyRate.y+button_moneyRate.height-button_moneyRate.height*0.4, "$" + "0", style );
-        label_sellDetail      = game.add.text(button_sellBonus.x+button_sellBonus.width*0.1, button_sellBonus.y+button_sellBonus.height-button_sellBonus.height*0.4, "Gain $" + "0" , style );
+        label_eavesdropDetail = game.add.text(button_eavesdropAmount.x+button_eavesdropAmount.width*0.1, button_eavesdropAmount.y+button_eavesdropAmount.height-button_eavesdropAmount.height*0.4, "$" + upgrade_eavesdropPrices[0], style );
+        label_rateDetail      = game.add.text(button_moneyRate.x+button_moneyRate.width*0.1, button_moneyRate.y+button_moneyRate.height-button_moneyRate.height*0.4, "$" + upgrade_ratePrices[0], style );
+        label_sellDetail      = game.add.text(button_sellBonus.x+button_sellBonus.width*0.1, button_sellBonus.y+button_sellBonus.height-button_sellBonus.height*0.4, "Gain $" + upgrade_eavesdropValues[0], style );
 
 
         // Hint
@@ -247,6 +247,11 @@ window.onload = function()
     // Adjusts button state and appearance
     function updateButtons()
     {
+        // Update button detail labels
+        label_eavesdropDetail.setText("$" + upgrade_eavesdropPrices[0]);
+        label_rateDetail.setText("$" + upgrade_ratePrices[0]);
+        label_sellDetail.setText("Gain $" + upgrade_eavesdropValues[0]);
+
         // Eavesdrop upgrade
         if(currentMoneySum >= upgrade_eavesdropPrices[0])   // Enough money
         {
@@ -260,13 +265,13 @@ window.onload = function()
         }
         else
         {
-            button_sellBonus.clear();
-            button_sellBonus.beginFill(0xD9D9D9);
-            button_sellBonus.lineStyle(1, 0x000000, 1);
-            button_sellBonus.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
-            label_sellHeader.addColor("#F2F2F2", 0);    // Color header text
-            label_sellDetail.addColor("#F2F2F2", 0);    // Color detail text
-            button_sellBonus.inputEnabled = false;      // Remove clickability
+            button_eavesdropAmount.clear();
+            button_eavesdropAmount.beginFill(0xD9D9D9);
+            button_eavesdropAmount.lineStyle(1, 0x000000, 1);
+            button_eavesdropAmount.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
+            label_eavesdropDetail.addColor("#F2F2F2", 0);    // Color header text
+            label_eavesdropDetail.addColor("#F2F2F2", 0);    // Color detail text
+            button_eavesdropAmount.inputEnabled = false;      // Remove clickability
         }
 
         // Money rate upgrade
@@ -282,13 +287,13 @@ window.onload = function()
         }
         else
         {
-            button_sellBonus.clear();
-            button_sellBonus.beginFill(0xD9D9D9);
-            button_sellBonus.lineStyle(1, 0x000000, 1);
-            button_sellBonus.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
-            label_sellHeader.addColor("#F2F2F2", 0);    // Color header text
-            label_sellDetail.addColor("#F2F2F2", 0);    // Color detail text
-            button_sellBonus.inputEnabled = false;      // Remove clickability
+            button_moneyRate.clear();
+            button_moneyRate.beginFill(0xD9D9D9);
+            button_moneyRate.lineStyle(1, 0x000000, 1);
+            button_moneyRate.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
+            label_rateHeader.addColor("#F2F2F2", 0);    // Color header text
+            label_rateDetail.addColor("#F2F2F2", 0);    // Color detail text
+            button_moneyRate.inputEnabled = false;      // Remove clickability
         }
 
         if(bonusAmount == bonusMax)
@@ -324,11 +329,18 @@ window.onload = function()
     function boughtEavesdrop()
     {
         console.log("Bought eavesdrop");
+        currentMoneySum -= upgrade_eavesdropPrices[0];
+        upgrade_eavesdropValues.shift();     // Shift so the rate is a new rate
+        upgrade_eavesdropPrices.shift();     // Shift so the price is now more
+
     }
 
     function boughtRate()
     {
         console.log("Bought rate increase");
+        currentMoneySum -= upgrade_ratePrices[0];
+        upgrade_rateValues.shift();     // Shift so the rate is a new rate
+        upgrade_ratePrices.shift();     // Shift so the price is now more
     }
 
     function soldBonus()
@@ -337,7 +349,6 @@ window.onload = function()
         bonusAmount = 0;    // Reset bonus amount
         currentMoneySum += upgrade_eavesdropValues[0];  // Grab value from current eavesdrop value
         saleBarFill.clear();// Redraw
-
     }
 
 
