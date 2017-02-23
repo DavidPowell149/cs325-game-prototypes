@@ -48,7 +48,7 @@ window.onload = function()
     var hintText;       // The instructions
 
     // Game logic
-    var currentMoneySum=0;    // Money the player currently has in their "pocket"
+    var currentMoneySum=100000;    // Money the player currently has in their "pocket"
     var bonusAmount = 0;
     var bonusMax = 10;
     var moneyUpdateTime = 1000;     // Update every second
@@ -58,10 +58,10 @@ window.onload = function()
 
 
     // Upgrade data
-    var upgrade_eavesdropPrices =       [50, 200, 500, 1000, 5000];
-    var upgrade_eavesdropValues =   [10, 25, 50, 100, 200, 400];
-    var upgrade_ratePrices =        [10, 100, 200, 1000, 5000];
-    var upgrade_rateValues =        [0, 1, 2, 5, 10, 20];
+    var upgrade_eavesdropPrices =       [50, 200, 500, 1000, 5000, 10000, 20000, 50000];
+    var upgrade_eavesdropValues =   [10, 25, 50, 100, 200, 400, 600, 800, 1000];
+    var upgrade_ratePrices =        [10, 100, 200, 1000, 5000, 10000, 15000, 25000];
+    var upgrade_rateValues =        [0, 1, 2, 5, 10, 20, 30, 40, 50];
 
 
     // Pre loads assets for game load
@@ -163,15 +163,15 @@ window.onload = function()
 
         // Initialize button labels
         var size_buttonHeader = Math.min(game.world.width, game.world.height)*0.023;
-        var size_buttonDetail = Math.min(game.world.width, game.world.height)*0.036;
+        var size_buttonDetail = Math.min(game.world.width, game.world.height)*0.030;
         var style = { font: "Verdana", fill: "#F2F2F2", align: "left", fontSize: String(size_buttonHeader)+"px", wordWrap: true, wordWrapWidth: button_eavesdropAmount.width};
         label_eavesdropHeader = game.add.text(button_eavesdropAmount.x+game.world.width*0.01, button_eavesdropAmount.y+game.world.height*0.01, "Increase conversation profit", style );
         label_rateHeader =      game.add.text(button_moneyRate.x+game.world.width*0.01, button_moneyRate.y+game.world.height*0.01, "Increase $ per sec", style );
         label_sellHeader =      game.add.text(button_sellBonus.x+game.world.width*0.01, button_sellBonus.y+game.world.height*0.01, "Sell conversation", style );
         style = { font: "Verdana", fill: "#F2F2F2", align: "left", fontSize: String(size_buttonDetail)+"px", wordWrap: true, wordWrapWidth: button_eavesdropAmount.width*3/4};
-        label_eavesdropDetail = game.add.text(button_eavesdropAmount.x+button_eavesdropAmount.width*0.1, button_eavesdropAmount.y+button_eavesdropAmount.height-button_eavesdropAmount.height*0.4, "$" + upgrade_eavesdropPrices[0], style );
-        label_rateDetail      = game.add.text(button_moneyRate.x+button_moneyRate.width*0.1, button_moneyRate.y+button_moneyRate.height-button_moneyRate.height*0.4, "$" + upgrade_ratePrices[0], style );
-        label_sellDetail      = game.add.text(button_sellBonus.x+button_sellBonus.width*0.1, button_sellBonus.y+button_sellBonus.height-button_sellBonus.height*0.4, "Gain $" + upgrade_eavesdropValues[0], style );
+        label_eavesdropDetail = game.add.text(button_eavesdropAmount.x+button_eavesdropAmount.width*0.05, button_eavesdropAmount.y+button_eavesdropAmount.height-button_eavesdropAmount.height*0.4, "$" + upgrade_eavesdropPrices[0], style );
+        label_rateDetail      = game.add.text(button_moneyRate.x+button_moneyRate.width*0.05, button_moneyRate.y+button_moneyRate.height-button_moneyRate.height*0.4, "$" + upgrade_ratePrices[0], style );
+        label_sellDetail      = game.add.text(button_sellBonus.x+button_sellBonus.width*0.05, button_sellBonus.y+button_sellBonus.height-button_sellBonus.height*0.4, "+ $" + upgrade_eavesdropValues[0], style );
 
 
         // Hint
@@ -272,7 +272,7 @@ window.onload = function()
         // Update button detail labels
         label_eavesdropDetail.setText("$" + upgrade_eavesdropPrices[0]);
         label_rateDetail.setText("$" + upgrade_ratePrices[0]);
-        label_sellDetail.setText("Gain $" + upgrade_eavesdropValues[0]);
+        label_sellDetail.setText("+ $" + upgrade_eavesdropValues[0]);
 
         // Eavesdrop upgrade
         if(currentMoneySum >= upgrade_eavesdropPrices[0])   // Enough money
