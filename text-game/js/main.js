@@ -17,6 +17,7 @@ window.onload = function()
     // Global variables
     var game = new Phaser.Game( 800, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var mainInput;  // The input for the game
+    var enterKey;
 
 
     // Pre loads assets for game load
@@ -33,7 +34,7 @@ window.onload = function()
         game.add.plugin(PhaserInput.Plugin);
 
 
-        var mainInput = game.add.inputField(0, game.world.height - 50, {
+        mainInput = game.add.inputField(0, game.world.height - 50, {
             font: '18px Arial',
             fill: 'white',
             fillAlpha: "0",
@@ -44,7 +45,8 @@ window.onload = function()
         });
         mainInput.focusOutOnEnter = false;
         // mainInput.setText("tst");
-
+        enterKey = game.input.keyboard.addKey(Phaser.KeyCode.ENTER);
+        enterKey.onDown.add(enterPressed, this);
     }
 
     // Runs every tick/iteration/moment/second
@@ -54,9 +56,9 @@ window.onload = function()
     }
 
 
-    function hitEnter()
+    function enterPressed()
     {
-        console.log("Hit enter");
+        console.log("Hit enter: " + mainInput.value);
     }
 
 };

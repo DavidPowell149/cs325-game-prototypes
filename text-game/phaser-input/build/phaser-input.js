@@ -511,10 +511,6 @@ var PhaserInput;
         InputField.prototype.keyListener = function (evt) {
             this.value = this.domElement.value;
             if (evt.keyCode === 13) {
-
-                hitEnter();
-
-
                 if (this.focusOutOnEnter) {
                     this.endFocus();
                 }
