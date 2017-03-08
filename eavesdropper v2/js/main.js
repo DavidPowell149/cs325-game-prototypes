@@ -52,10 +52,10 @@ window.onload = function()
     var currentMoneySum=0;    // Money the player currently has in their "pocket"
     var bonusAmount = 0;
     var bonusMax = 10;
-    var personSpeed=2;
+    var personSpeed=4;
     var moneyUpdateTime = 1000;     // Update every second
     var lasyMoneyUpdate = 0;
-    var peopleUpdateTime = 1000;     // Update every second
+    var peopleUpdateTime = 300;     // Update every second
     var lastPeopleUpdate = 0;
     var peopleCreateTime = 50;
     var lastPeopleCreate = 0;
@@ -101,7 +101,7 @@ window.onload = function()
 
         audio_crowd = game.add.audio('crowd');
         audio_crowd.loop = true;
-        audio_crowd.volume= 0.8;
+        audio_crowd.volume = 0.8;
         audio_crowd.play();
         audio_coin = game.add.audio('coin');
         audio_upgrade = game.add.audio('upgrade');
@@ -130,12 +130,12 @@ window.onload = function()
         if((game.time.now - lastPeopleCreate) > peopleCreateTime)
         {
             lastPeopleCreate = game.time.now;
-            console.log("Generate person");
 
             tempPerson = game.add.sprite(0, Math.random()*(pavementBounds.height*0.9)+(pavementBounds.y+pavementBounds.height*0.05), "person");
             tempPerson.anchor.setTo(0.5,0.5);
             var personSize = Math.min(game.world.width*0.00008, game.world.height*0.00008)
             tempPerson.scale.setTo(personSize, personSize);
+            tempPerson.inputEnabled = true;
             personGroup.add(tempPerson);
         }
     }
@@ -227,9 +227,8 @@ window.onload = function()
                 // This code runs for each item in the group
 
                 var conversationChance = Math.random();
-                if(conversationChance >= 0.995)
+                if(conversationChance >= 0.99)
                 {
-                    person.inputEnabled = true;
                     person.loadTexture("person_red");
                 }
 
@@ -365,11 +364,19 @@ window.onload = function()
     // Runs when a person is legally clicked
     function personClicked(person)
     {
-        person.loadTexture("person");
-        if(bonusAmount<10) { bonusAmount += 1; }    // Update bar
-        audio_gather.play();
-        updateBonusBar();
-        person.inputEnabled = false;
+        if(person.texture.baseTexture.source.name === "person_red")
+        {
+            console.log("Red");
+            person.loadTexture("person");
+            if(bonusAmount<10) { bonusAmount += 1; }    // Update bar
+            audio_gather.play();
+            updateBonusBar();
+        }
+        else
+        {
+            console.log("Blue");
+        }
+
     }
 
     function boughtEavesdrop()
