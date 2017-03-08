@@ -170,8 +170,8 @@ window.onload = function()
 
 
         // Hint
-        style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(Math.min(game.world.width, game.world.height)*0.02)+"px", wordWrap: true, wordWrapWidth: game.world.width*0.15};
-        hintText = game.add.text(game.world.width*0.85, game.world.height*0.02, "1. Click on red people to eavesdrop on bits of a conversation.\n2. Sell a full conversation for profit.\n\nClick to hide instructions.", style );
+        style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(Math.min(game.world.width, game.world.height)*0.02)+"px", wordWrap: true, wordWrapWidth: game.world.width*0.50};
+        hintText = game.add.text(game.world.width*0.50, game.world.height*0.02, "1. Click on red people to eavesdrop on bits of a conversation.\n2. Sell a full conversation for bonus cash.\n\nClick to hide instructions.", style );
         hintText.inputEnabled = true;
         hintText.events.onInputUp.add(removeHint, this);
     }
