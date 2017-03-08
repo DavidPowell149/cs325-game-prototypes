@@ -57,7 +57,7 @@ window.onload = function()
     var lasyMoneyUpdate = 0;
     var peopleUpdateTime = 1000;     // Update every second
     var lastPeopleUpdate = 0;
-    var peopleCreateTime = 200;     // Update every second
+    var peopleCreateTime = 50;
     var lastPeopleCreate = 0;
 
 
@@ -91,7 +91,7 @@ window.onload = function()
         game.stage.backgroundColor = "#E6E6E6";
 
         // The pavement
-        pavementBounds = {x: game.world.width*0.20, y:game.world.height*0.20, width: game.world.width*0.60, height: game.world.height*0.60};  // Area the people should exist in
+        pavementBounds = {x: game.world.width*0.03, y:game.world.height*0.20, width: game.world.width*0.97, height: game.world.height*0.60};  // Area the people should exist in
         pavement = game.add.tileSprite(pavementBounds.x, pavementBounds.y, pavementBounds.width, pavementBounds.height, "pavement");
 
         // The player
@@ -108,10 +108,9 @@ window.onload = function()
         audio_upgrade.volume= 0.3;
         audio_gather = game.add.audio('gather');
 
+        // Initialize people
+        personGroup = game.add.group();  // Group for spikes
 
-
-
-        initializePeople();
         initializeButtons();
         initializeGUI();
     }
@@ -132,24 +131,15 @@ window.onload = function()
         {
             lastPeopleCreate = game.time.now;
             console.log("Generate person");
-        }
-    }
 
-    function initializePeople()
-    {
-        // The crowd
-        personGroup = game.add.group();  // Group for spikes
-
-        var i;
-        for(i=0; i<20; i++)
-        {
-            tempPerson = game.add.sprite(Math.random()*200+10, Math.random()*200+10, "person");
+            tempPerson = game.add.sprite(0, Math.random()*(pavementBounds.height*0.9)+(pavementBounds.y+pavementBounds.height*0.05), "person");
             tempPerson.anchor.setTo(0.5,0.5);
             var personSize = Math.min(game.world.width*0.00008, game.world.height*0.00008)
             tempPerson.scale.setTo(personSize, personSize);
             personGroup.add(tempPerson);
         }
     }
+
 
     function initializeGUI()
     {
@@ -158,9 +148,11 @@ window.onload = function()
         //
         // The left bar for the sale bonus bar
         saleBarOutline = game.add.graphics(0,0);
+        saleBarOutline.beginFill(0xFFFFFF);
         saleBarOutline.lineStyle(1, 0x000000, 1);
         saleBarOutline.drawRect(0, 0, game.world.width*0.03, game.world.height-1);
         saleBarFill = game.add.graphics(0,0);
+
         // Initialize money labels
         var size_currentMoneySum = Math.min(game.world.width, game.world.height)*0.05;
         var size_moneyRate = Math.min(game.world.width, game.world.height)*0.025;
@@ -227,6 +219,9 @@ window.onload = function()
     // Updates the people and their state
     function updatePeople()
     {
+        // Move pavement as well
+        pavement.tilePosition.x += personSpeed/2;
+
         if((game.time.now - lastPeopleUpdate) > peopleUpdateTime)
         {
             lastPeopleUpdate = game.time.now;
@@ -252,7 +247,6 @@ window.onload = function()
             // This code runs for each item in the group
             // Move to the right
             person.x = person.x+personSpeed;
-
 
             // Check if clicked
             person.events.onInputUp.add(personClicked, this, person);
