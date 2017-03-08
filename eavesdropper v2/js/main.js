@@ -179,19 +179,19 @@ window.onload = function()
     function initializeButtons()
     {
         // Buttons
-        button_eavesdropAmount = game.add.graphics(game.world.width*0.20, game.world.height-(game.world.height*0.15)-2);
+        button_eavesdropAmount = game.add.graphics(game.world.width*0.20, game.world.height-(game.world.height*0.19));
         button_eavesdropAmount.beginFill(0xD9D9D9);
         button_eavesdropAmount.lineStyle(1, 0x000000, 1);
         button_eavesdropAmount.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
         button_eavesdropAmount.inputEnabled = false;
         button_eavesdropAmount.events.onInputUp.add(boughtEavesdrop, this);
-        button_moneyRate = game.add.graphics(game.world.centerX-(game.world.width*0.17)/2, game.world.height-(game.world.height*0.15)-2);
+        button_moneyRate = game.add.graphics(game.world.centerX-(game.world.width*0.17)/2, game.world.height-(game.world.height*0.19));
         button_moneyRate.beginFill(0xD9D9D9);
         button_moneyRate.lineStyle(1, 0x000000, 1);
         button_moneyRate.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
         button_moneyRate.inputEnabled = false;
         button_moneyRate.events.onInputUp.add(boughtRate, this);
-        button_sellBonus = game.add.graphics(game.world.width*0.63, game.world.height-(game.world.height*0.15)-2);
+        button_sellBonus = game.add.graphics(game.world.width*0.63, game.world.height-(game.world.height*0.19));
         button_sellBonus.beginFill(0xD9D9D9);
         button_sellBonus.lineStyle(1, 0x000000, 1);
         button_sellBonus.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
@@ -270,7 +270,8 @@ window.onload = function()
         saleBarFill.clear();    // Clear it so we can redraw
         saleBarFill.beginFill(0x008214);
         saleBarFill.lineStyle(1, 0x008214, 1);
-        saleBarFill.drawRect(1, (game.world.height-1)-(game.world.height*(bonusAmount/bonusMax)), game.world.width*0.03-2, (game.world.height*(bonusAmount/bonusMax)));
+        // saleBarFill.drawRect(1, (game.world.height-1)-(game.world.height*(bonusAmount/bonusMax)), game.world.width*0.03-2, (game.world.height*(bonusAmount/bonusMax)));
+        saleBarFill.drawRect(1, game.world.height-(game.world.height*0.04), game.world.width*(bonusAmount/bonusMax), game.world.height*0.04);
     }
 
     // Adjusts button state and appearance
@@ -366,7 +367,6 @@ window.onload = function()
     {
         if(person.texture.baseTexture.source.name === "person_red")
         {
-            console.log("Red");
             person.loadTexture("person");
             if(bonusAmount<10) { bonusAmount += 1; }    // Update bar
             audio_gather.play();
@@ -374,7 +374,10 @@ window.onload = function()
         }
         else
         {
-            console.log("Blue");
+            // Remove bonus
+            bonusAmount = 0;
+            // Play bonus lost sound
+            updateBonusBar();
         }
 
     }
