@@ -91,7 +91,7 @@ window.onload = function()
         game.stage.backgroundColor = "#E6E6E6";
 
         // The pavement
-        pavementBounds = {x: game.world.width*0.03, y:game.world.height*0.20, width: game.world.width*0.97, height: game.world.height*0.60};  // Area the people should exist in
+        pavementBounds = {x: 0, y:game.world.height*0.20, width: game.world.width, height: game.world.height*0.60};  // Area the people should exist in
         pavement = game.add.tileSprite(pavementBounds.x, pavementBounds.y, pavementBounds.width, pavementBounds.height, "pavement");
 
         // The player
@@ -146,11 +146,6 @@ window.onload = function()
         //
         // GUI initiliaiztion
         //
-        // The left bar for the sale bonus bar
-        saleBarOutline = game.add.graphics(0,0);
-        saleBarOutline.beginFill(0xFFFFFF);
-        saleBarOutline.lineStyle(1, 0x000000, 1);
-        saleBarOutline.drawRect(0, 0, game.world.width*0.03, game.world.height-1);
         saleBarFill = game.add.graphics(0,0);
 
         // Initialize money labels
@@ -250,6 +245,13 @@ window.onload = function()
 
             // Check if clicked
             person.events.onInputUp.add(personClicked, this, person);
+
+            // Check if person goes off screen
+            if(person.x > game.world.width+game.world.width*0.05)
+            {
+                person.destroy();
+            }
+
         }, this);
 
     }
