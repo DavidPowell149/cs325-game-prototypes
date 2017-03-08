@@ -27,6 +27,8 @@ window.onload = function()
     var audio_coin;
     var audio_upgrade;
     var audio_gather;
+    var audio_error;
+    var audio_bonusWarning;
 
     // GUI
     var label_currentMoneySum;    // Label for sum of money
@@ -81,7 +83,8 @@ window.onload = function()
         game.load.audio( "coin", 'assets/audio/coin.mp3');
         game.load.audio( "upgrade", 'assets/audio/upgrade.wav');
         game.load.audio( "gather", 'assets/audio/gather.wav');
-
+        game.load.audio( "error", 'assets/audio/error.wav');
+        game.load.audio( "bonus_warning", 'assets/audio/bonus_warning.wav');
     }
 
     // Called on game's initial creation state
@@ -107,6 +110,8 @@ window.onload = function()
         audio_upgrade = game.add.audio('upgrade');
         audio_upgrade.volume= 0.3;
         audio_gather = game.add.audio('gather');
+        audio_error = game.add.audio('error');
+        audio_bonusWarning = game.add.audio('bonus_warning');
 
         // Initialize people
         personGroup = game.add.group();  // Group for spikes
@@ -171,7 +176,7 @@ window.onload = function()
 
         // Hint
         style = { font: "Verdana", fill: "#000000", align: "left", fontSize: String(Math.min(game.world.width, game.world.height)*0.02)+"px", wordWrap: true, wordWrapWidth: game.world.width*0.50};
-        hintText = game.add.text(game.world.width*0.50, game.world.height*0.02, "1. Click on red people to eavesdrop on bits of a conversation.\n2. Sell a full conversation for bonus cash.\n\nClick to hide instructions.", style );
+        hintText = game.add.text(game.world.width*0.50, game.world.height*0.02, "1. Click on red people to eavesdrop on bits of a conversation.\n2. Sell a full conversation for bonus cash.\n3. Clicking a blue person will reset your bonus\n\nClick to hide instructions.", style );
         hintText.inputEnabled = true;
         hintText.events.onInputUp.add(removeHint, this);
     }
@@ -367,17 +372,28 @@ window.onload = function()
     {
         if(person.texture.baseTexture.source.name === "person_red")
         {
-            person.loadTexture("person");
-            if(bonusAmount<10) { bonusAmount += 1; }    // Update bar
-            audio_gather.play();
-            updateBonusBar();
+            if(bonusAmount === bonusMax)
+            {
+                audio_bonusWarning.play();
+            }
+            else
+            {
+                // Legal click
+                person.loadTexture("person");
+                if(bonusAmount<10) { bonusAmount += 1; }    // Update bar
+                audio_gather.play();
+                updateBonusBar();
+            }
         }
         else
         {
-            // Remove bonus
-            bonusAmount = 0;
-            // Play bonus lost sound
-            updateBonusBar();
+            if(bonusAmount!==0)
+            {
+                // Remove bonus
+                bonusAmount = 0;
+                audio_error.play();    // Play bonus lost sound
+                updateBonusBar();
+            }
         }
 
     }
