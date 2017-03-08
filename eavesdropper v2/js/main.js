@@ -21,7 +21,6 @@ window.onload = function()
     var player;     // The player's avatar
     var tempPerson;
     var personGroup;    // The group for the people
-    var peopleBounds;
 
     // Audio
     var audio_crowd;
@@ -34,6 +33,8 @@ window.onload = function()
     var label_moneyRate;          // Label for money earning rate
     var saleBarOutline;     // The visual bar outline
     var saleBarFill;        // The visual bar filler
+    var pavement;
+    var pavementBounds;
 
     var button_eavesdropAmount; // The first button option
     var button_moneyRate;       // The second button option
@@ -51,11 +52,13 @@ window.onload = function()
     var currentMoneySum=0;    // Money the player currently has in their "pocket"
     var bonusAmount = 0;
     var bonusMax = 10;
+    var personSpeed=2;
     var moneyUpdateTime = 1000;     // Update every second
     var lasyMoneyUpdate = 0;
     var peopleUpdateTime = 1000;     // Update every second
     var lastPeopleUpdate = 0;
-    var peopleMaxRedDuration = 1200;    // Amount of time people stay red
+    var peopleCreateTime = 200;     // Update every second
+    var lastPeopleCreate = 0;
 
 
     // Upgrade data
@@ -72,6 +75,7 @@ window.onload = function()
         game.load.image( "player", 'assets/player.png' );
         game.load.image( "person", 'assets/person.png' );
         game.load.image( "person_red", 'assets/person_red.png' );
+        game.load.image( "pavement", 'assets/pavement.jpg' );
         // Audio
         game.load.audio( "crowd", 'assets/audio/crowd.wav');
         game.load.audio( "coin", 'assets/audio/coin.mp3');
@@ -85,6 +89,10 @@ window.onload = function()
     {
         // The background
         game.stage.backgroundColor = "#E6E6E6";
+
+        // The pavement
+        pavementBounds = {x: game.world.width*0.20, y:game.world.height*0.20, width: game.world.width*0.60, height: game.world.height*0.60};  // Area the people should exist in
+        pavement = game.add.tileSprite(pavementBounds.x, pavementBounds.y, pavementBounds.width, pavementBounds.height, "pavement");
 
         // The player
         player = game.add.sprite(game.world.centerX, game.world.centerY, "player");
@@ -101,6 +109,8 @@ window.onload = function()
         audio_gather = game.add.audio('gather');
 
 
+
+
         initializePeople();
         initializeButtons();
         initializeGUI();
@@ -113,34 +123,31 @@ window.onload = function()
         updateLabels();
         updateButtons();
         calculateMoney();
+        generatePeople();
+    }
+
+    function generatePeople()
+    {
+        if((game.time.now - lastPeopleCreate) > peopleCreateTime)
+        {
+            lastPeopleCreate = game.time.now;
+            console.log("Generate person");
+        }
     }
 
     function initializePeople()
     {
         // The crowd
         personGroup = game.add.group();  // Group for spikes
-        peopleBounds = {x: game.world.width*0.20, y:game.world.height*0.20, width: game.world.width*0.60, height: game.world.height*0.60};  // Area the people should exist in
-        var peopleGridWidth = 11;
-        var peopleGridHeight = 11;
-        var peopleTileWidth = peopleBounds.width/peopleGridWidth;
-        var peopleTileHeight = peopleBounds.height/peopleGridHeight;
-        var c;
-        for(c=0; c<peopleGridHeight; c++)
-        {
-            var r;
-            for(r=0; r<peopleGridWidth; r++)
-            {
-                var baseX = peopleBounds.x + (peopleTileWidth*r) + peopleTileWidth/2;
-                var baseY = peopleBounds.y + (peopleTileHeight*c) + peopleTileHeight/2;
-                var x = baseX + Math.random()*peopleTileWidth-(peopleTileWidth/2) ;
-                var y = baseY + Math.random()*peopleTileHeight-(peopleTileHeight/2);
 
-                tempPerson = game.add.sprite(x, y, "person");
-                tempPerson.anchor.setTo(0.5,0.5);
-                var personSize = Math.min(peopleTileWidth,peopleTileHeight)*0.0014;
-                tempPerson.scale.setTo(personSize, personSize);
-                personGroup.add(tempPerson);
-            }
+        var i;
+        for(i=0; i<20; i++)
+        {
+            tempPerson = game.add.sprite(Math.random()*200+10, Math.random()*200+10, "person");
+            tempPerson.anchor.setTo(0.5,0.5);
+            var personSize = Math.min(game.world.width*0.00008, game.world.height*0.00008)
+            tempPerson.scale.setTo(personSize, personSize);
+            personGroup.add(tempPerson);
         }
     }
 
@@ -243,6 +250,10 @@ window.onload = function()
         personGroup.forEach( function(person)
         {
             // This code runs for each item in the group
+            // Move to the right
+            person.x = person.x+personSpeed;
+
+
             // Check if clicked
             person.events.onInputUp.add(personClicked, this, person);
         }, this);
