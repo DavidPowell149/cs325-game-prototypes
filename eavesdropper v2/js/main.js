@@ -38,20 +38,23 @@ window.onload = function()
     var pavement;
     var pavementBounds;
 
+    var button_clickAmount; // The first button option
     var button_eavesdropAmount; // The first button option
     var button_moneyRate;       // The second button option
     var button_sellBonus;       // Selling the bonus bar
-    var label_eavesdropHeader;    // Label for sum of money
+    var label_clickHeader;    // Label for click amount
+    var label_clickDetail;
+    var label_eavesdropHeader;    // Label for eavesdrop
     var label_eavesdropDetail;
-    var label_rateHeader;          // Label for money earning rate
+    var label_rateHeader;          // Label for rate
     var label_rateDetail;
-    var label_sellHeader;          // Label for money earning rate
+    var label_sellHeader;          // Label for selling
     var label_sellDetail;
 
     var hintText;       // The instructions
 
     // Game logic
-    var currentMoneySum=0;    // Money the player currently has in their "pocket"
+    var currentMoneySum=1000000;    // Money the player currently has in their "pocket"
     var bonusAmount = 0;
     var bonusMax = 10;
     var personSpeed=4;
@@ -64,6 +67,8 @@ window.onload = function()
 
 
     // Upgrade data
+    var upgrade_clickPrices =   [30, 60, 250, 700, 1500];
+    var upgrade_clickValues =   [1, 2, 3, 5, 10, 15];
     var upgrade_eavesdropPrices =       [50, 200, 500, 1000, 5000, 10000, 20000, 50000];
     var upgrade_eavesdropValues =   [10, 25, 50, 100, 200, 400, 600, 800, 1000];
     var upgrade_ratePrices =        [10, 100, 200, 1000, 5000, 10000, 15000, 25000];
@@ -165,10 +170,12 @@ window.onload = function()
         var size_buttonHeader = Math.min(game.world.width, game.world.height)*0.023;
         var size_buttonDetail = Math.min(game.world.width, game.world.height)*0.030;
         var style = { font: "Verdana", fill: "#F2F2F2", align: "left", fontSize: String(size_buttonHeader)+"px", wordWrap: true, wordWrapWidth: button_eavesdropAmount.width};
+        label_clickHeader = game.add.text(button_clickAmount.x+game.world.width*0.01, button_eavesdropAmount.y+game.world.height*0.01, "Increase click profit", style );
         label_eavesdropHeader = game.add.text(button_eavesdropAmount.x+game.world.width*0.01, button_eavesdropAmount.y+game.world.height*0.01, "Increase conversation profit", style );
         label_rateHeader =      game.add.text(button_moneyRate.x+game.world.width*0.01, button_moneyRate.y+game.world.height*0.01, "Increase $ per sec", style );
         label_sellHeader =      game.add.text(button_sellBonus.x+game.world.width*0.01, button_sellBonus.y+game.world.height*0.01, "Sell conversation", style );
         style = { font: "Verdana", fill: "#F2F2F2", align: "left", fontSize: String(size_buttonDetail)+"px", wordWrap: true, wordWrapWidth: button_eavesdropAmount.width*3/4};
+        label_clickDetail = game.add.text(button_clickAmount.x+button_eavesdropAmount.width*0.05, button_eavesdropAmount.y+button_eavesdropAmount.height-button_eavesdropAmount.height*0.4, "$" + upgrade_clickPrices[0], style );
         label_eavesdropDetail = game.add.text(button_eavesdropAmount.x+button_eavesdropAmount.width*0.05, button_eavesdropAmount.y+button_eavesdropAmount.height-button_eavesdropAmount.height*0.4, "$" + upgrade_eavesdropPrices[0], style );
         label_rateDetail      = game.add.text(button_moneyRate.x+button_moneyRate.width*0.05, button_moneyRate.y+button_moneyRate.height-button_moneyRate.height*0.4, "$" + upgrade_ratePrices[0], style );
         label_sellDetail      = game.add.text(button_sellBonus.x+button_sellBonus.width*0.05, button_sellBonus.y+button_sellBonus.height-button_sellBonus.height*0.4, "+ $" + upgrade_eavesdropValues[0], style );
@@ -184,19 +191,25 @@ window.onload = function()
     function initializeButtons()
     {
         // Buttons
-        button_eavesdropAmount = game.add.graphics(game.world.width*0.20, game.world.height-(game.world.height*0.19));
+        button_clickAmount = game.add.graphics(game.world.width*0.10, game.world.height-(game.world.height*0.19));
+        button_clickAmount.beginFill(0xD9D9D9);
+        button_clickAmount.lineStyle(1, 0x000000, 1);
+        button_clickAmount.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
+        button_clickAmount.inputEnabled = false;
+        button_clickAmount.events.onInputUp.add(boughtClick, this);
+        button_eavesdropAmount = game.add.graphics(game.world.width*0.30, game.world.height-(game.world.height*0.19));
         button_eavesdropAmount.beginFill(0xD9D9D9);
         button_eavesdropAmount.lineStyle(1, 0x000000, 1);
         button_eavesdropAmount.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
         button_eavesdropAmount.inputEnabled = false;
         button_eavesdropAmount.events.onInputUp.add(boughtEavesdrop, this);
-        button_moneyRate = game.add.graphics(game.world.centerX-(game.world.width*0.17)/2, game.world.height-(game.world.height*0.19));
+        button_moneyRate = game.add.graphics(game.world.width*0.50, game.world.height-(game.world.height*0.19));
         button_moneyRate.beginFill(0xD9D9D9);
         button_moneyRate.lineStyle(1, 0x000000, 1);
         button_moneyRate.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
         button_moneyRate.inputEnabled = false;
         button_moneyRate.events.onInputUp.add(boughtRate, this);
-        button_sellBonus = game.add.graphics(game.world.width*0.63, game.world.height-(game.world.height*0.19));
+        button_sellBonus = game.add.graphics(game.world.width*0.70, game.world.height-(game.world.height*0.19));
         button_sellBonus.beginFill(0xD9D9D9);
         button_sellBonus.lineStyle(1, 0x000000, 1);
         button_sellBonus.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
@@ -283,9 +296,32 @@ window.onload = function()
     function updateButtons()
     {
         // Update button detail labels
+        label_clickDetail.setText("$" + upgrade_clickPrices[0]);
         label_eavesdropDetail.setText("$" + upgrade_eavesdropPrices[0]);
         label_rateDetail.setText("$" + upgrade_ratePrices[0]);
         label_sellDetail.setText("+ $" + upgrade_eavesdropValues[0]);
+
+        // Eavesdrop upgrade
+        if(currentMoneySum >= upgrade_clickPrices[0])   // Enough money
+        {
+            button_clickAmount.clear();
+            button_clickAmount.beginFill(0x404040);
+            button_clickAmount.lineStyle(1, 0x000000, 1);
+            button_clickAmount.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
+            label_clickHeader.addColor("#FFFFFF", 0);    // Color header text
+            label_clickDetail.addColor("#FFFFFF", 0);    // Color detail text
+            button_clickAmount.inputEnabled = true;       // Give clickability
+        }
+        else
+        {
+            button_clickAmount.clear();
+            button_clickAmount.beginFill(0xD9D9D9);
+            button_clickAmount.lineStyle(1, 0x000000, 1);
+            button_clickAmount.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
+            label_clickHeader.addColor("#F2F2F2", 0);    // Color header text
+            label_clickDetail.addColor("#F2F2F2", 0);    // Color detail text
+            button_clickAmount.inputEnabled = false;      // Remove clickability
+        }
 
         // Eavesdrop upgrade
         if(currentMoneySum >= upgrade_eavesdropPrices[0])   // Enough money
@@ -294,7 +330,7 @@ window.onload = function()
             button_eavesdropAmount.beginFill(0x404040);
             button_eavesdropAmount.lineStyle(1, 0x000000, 1);
             button_eavesdropAmount.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
-            label_eavesdropDetail.addColor("#FFFFFF", 0);    // Color header text
+            label_eavesdropHeader.addColor("#FFFFFF", 0);    // Color header text
             label_eavesdropDetail.addColor("#FFFFFF", 0);    // Color detail text
             button_eavesdropAmount.inputEnabled = true;       // Give clickability
         }
@@ -304,7 +340,7 @@ window.onload = function()
             button_eavesdropAmount.beginFill(0xD9D9D9);
             button_eavesdropAmount.lineStyle(1, 0x000000, 1);
             button_eavesdropAmount.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
-            label_eavesdropDetail.addColor("#F2F2F2", 0);    // Color header text
+            label_eavesdropHeader.addColor("#F2F2F2", 0);    // Color header text
             label_eavesdropDetail.addColor("#F2F2F2", 0);    // Color detail text
             button_eavesdropAmount.inputEnabled = false;      // Remove clickability
         }
@@ -317,7 +353,7 @@ window.onload = function()
             button_moneyRate.lineStyle(1, 0x000000, 1);
             button_moneyRate.drawRect(0,0, game.world.width*0.17, game.world.height*0.15);
             label_rateHeader.addColor("#FFFFFF", 0);    // Color header text
-            label_rateHeader.addColor("#FFFFFF", 0);    // Color detail text
+            label_rateDetail.addColor("#FFFFFF", 0);    // Color detail text
             button_moneyRate.inputEnabled = true;       // Give clickability
         }
         else
@@ -353,6 +389,12 @@ window.onload = function()
         }
 
         // Check if upgrade path is done. If it is, kill the button
+        if(upgrade_clickPrices.length == 0)
+        {
+            button_clickAmount.clear();
+            label_clickHeader.destroy();
+            label_clickDetail.destroy();
+        }
         if(upgrade_eavesdropPrices.length == 0)
         {
             button_eavesdropAmount.clear();
@@ -383,6 +425,8 @@ window.onload = function()
                 if(bonusAmount<10) { bonusAmount += 1; }    // Update bar
                 audio_gather.play();
                 updateBonusBar();
+
+                currentMoneySum += upgrade_clickValues[0];
             }
         }
         else
@@ -396,6 +440,15 @@ window.onload = function()
             }
         }
 
+    }
+
+    function boughtClick()
+    {
+        console.log("Bought click");
+        currentMoneySum -= upgrade_clickPrices[0];
+        upgrade_clickValues.shift();     // Shift so the rate is a new rate
+        upgrade_clickPrices.shift();     // Shift so the price is now more
+        audio_upgrade.play();
     }
 
     function boughtEavesdrop()
