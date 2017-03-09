@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Eavesdropper</title>
+    <title>Eavesdropper v2</title>
     <script src="js/phaser.js"></script>
     <script src="js/main.js"></script>
 
@@ -22,11 +22,11 @@ body
 <body>
 <div id="game"></div>
 <div id="readme">
-<h2>Eavesdropper</h2>
+<h2>Eavesdropper v2</h2>
 <ul>
 
 <li><strong>High Concept:</strong>
-Progress incrementally by eavesdropping and buying upgrades.
+Progress incrementally by eavesdropping on the crowd and buying upgrades.
 </li>
 
 <li><strong>Theme:</strong>
@@ -34,25 +34,43 @@ Eavesdropping
 </li>
 
 <li><strong>Mandated Variety:</strong>
-Input: Buttons; Randomness: Deterministic; Play style: Achiever; Genres: Idle (other)
+Input: Buttons; Randomness: Deterministic; Play style: Achiever; Genres: Incremental Game (other)
 </li>
 
 <li><strong>Player Experience Goals:</strong>
-What experience do you want players to have when playing your game?
-
-I hope they are entertained by
+I hope they get satisfaction from the constant upgrades and sense of accomplishment.
 </li>
 
 <li><strong>Gameplay:</strong>
-The player waits to see when blue people turn red, which means they can be eavesdropped on. Click on a red person to eavsdrop, and gain a little bit of information about a conversation. Once you have enough tidbits, you can sell the conversation to gain a profit. Use your income to buy upgrades, which in turn allow you to collect money at faster rates. Upgrading your conversation profit is a more manual-approach, while upgrading your dollars per second is a more idle approach.
+The player waits to see when blue people turn red, which means they can be eavesdropped on. Click on a red person to eavesdrop, and gain a little bit of information about a conversation. Each eavesdrop will net you some money. Once you have enough tidbits, you can sell the conversation for a bonus profit. If you click on a blue person however, your bonus will reset to zero. Use your income to buy upgrades, which in turn allow you to collect money at faster rates.
 </li>
 
 <li><strong>Prototype Goal:</strong>
-Basic idle mechanics: collect a currency and using that same currency to increase the future rate of income.
+Basic idle mechanics: collect a currency and invest that same currency to increase the future rate of income.
 </li>
 
 <li><strong>Features:</strong>
 Basic idle games tend to have an automatic component, and a manual component. My manual "whack-a-mole" mechanic is not something I've personally seen done before in idle games. I've played quite a few, and I still find this fun and interesting.
+
+What I improved from the original design:
+<ul>
+    Rules/Procedures/Core Mechanic Enhancements:
+    <ul>
+        <li>Clicking on red people gives you money, not just selling your bonus.</li>
+        <li>The crowd now moves across the screen, making it more difficult to click the red people.</li>
+        <li>Clicking on a blue person now resets your bonus bar back to zero, to add some difficulty.</li>
+        <li>You cannot click on more red people if your bonus bar is full. You must sell the bonus first.</li>
+    </ul>
+    Polish Enhancements:
+    <ul>
+        <li>Added moving background for scenary.</li>
+        <li>Added additional, meaningful sounds for clicking on blue people and for the bonus being maxed out.</li>
+        <li>Rearranged some UI elements so they work with the game's new design.</li>
+    </ul>
+
+
+</ul>
+
 </li>
 
 <li><strong>Setting/Premise:</strong>
@@ -81,15 +99,21 @@ Did you make your prototype assets from scratch? Did you borrow them? Cite your 
 <li>Crowd noise: <a href="https://freesound.org/people/eguobyte/sounds/360703/">Large_crowd_medium_distance</a></li>
 <li>Coin noise: <a href="https://freesound.org/people/corbanha/sounds/241971/">coin_sound</a></li>
 <li>Upgrade noise: <a href="https://freesound.org/people/SomeGuy22/sounds/361230/">8-Bit Bounce</a></li>
-<li>Error noise: <a href="https://freesound.org/people/Mick%20Gibbs/sounds/249713/"></a>short-glitch</li>
-<li>Bonus warning noise: <a href="https://freesound.org/people/copyc4t/sounds/235652/">TF_Buzz</a></li>
+<li>Error noise: <a href="https://freesound.org/people/Mick%20Gibbs/sounds/249713/">short-glitch</a></li>
+<li>Bonus warning noise: <a href="https://freesound.org/people/Davidsraba/sounds/347167/">Bleep Sound</a></li>
 <li>Pavement texture: <a href="http://texturelib.com/texture/?path=/Textures/brick/pavement/brick_pavement_0131">pavement texture</a></li>
 
 </ul>
 </li>
 
 <li><strong>Prototype Closest Other Game:</strong>
-I did not borrow any code. Similar games might be Cookie Clicker, Spaceplan, or Egg Inc.
+This game is an iteration of <a href="https://davidpowell149.github.io/cs325-game-prototypes/eavesdropper/">Eavesdropper v1</a>.
+
+Not familiar with incremental games? Here are some other popular examples of the genre:
+<ul>
+<li><a href="http://orteil.dashnet.org/cookieclicker/">Cookie Clicker</a></li>
+<li><a href="http://jhollands.co.uk/spaceplan/">Spaceplan</a></li>
+</ul>
 </li>
 
 </ul>

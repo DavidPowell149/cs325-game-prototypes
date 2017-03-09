@@ -62,16 +62,16 @@ window.onload = function()
     var lasyMoneyUpdate = 0;
     var peopleUpdateTime = 300;     // Update every second
     var lastPeopleUpdate = 0;
-    var peopleCreateTime = 50;
+    var peopleCreateTime = 40;
     var lastPeopleCreate = 0;
 
 
     // Upgrade data
     var upgrade_clickPrices =   [30, 60, 250, 700, 1500];
     var upgrade_clickValues =   [1, 2, 3, 5, 10, 15];
-    var upgrade_eavesdropPrices =       [50, 200, 500, 1000, 5000, 10000, 20000, 50000];
+    var upgrade_eavesdropPrices =       [40, 100, 250, 500, 1000, 1500, 2000, 5000];
     var upgrade_eavesdropValues =   [10, 25, 50, 100, 200, 400, 600, 800, 1000];
-    var upgrade_ratePrices =        [10, 100, 200, 1000, 5000, 10000, 15000, 25000];
+    var upgrade_ratePrices =        [10, 50, 100, 200, 500, 1000, 1500, 2500];
     var upgrade_rateValues =        [0, 1, 2, 5, 10, 20, 30, 40, 50];
 
 
