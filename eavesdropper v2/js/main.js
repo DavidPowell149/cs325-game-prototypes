@@ -54,7 +54,7 @@ window.onload = function()
     var hintText;       // The instructions
 
     // Game logic
-    var currentMoneySum=1000000;    // Money the player currently has in their "pocket"
+    var currentMoneySum=0;    // Money the player currently has in their "pocket"
     var bonusAmount = 0;
     var bonusMax = 10;
     var personSpeed=4;
