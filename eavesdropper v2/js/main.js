@@ -57,7 +57,7 @@ window.onload = function()
     var currentMoneySum=0;    // Money the player currently has in their "pocket"
     var bonusAmount = 0;
     var bonusMax = 10;
-    var personSpeed=4;
+    var personSpeed;
     var moneyUpdateTime = 1000;     // Update every second
     var lasyMoneyUpdate = 0;
     var peopleUpdateTime = 300;     // Update every second
@@ -121,6 +121,10 @@ window.onload = function()
         // Initialize people
         personGroup = game.add.group();  // Group for spikes
 
+        personSpeed = game.world.width*0.0048;
+
+        if(personSpeed >= 4.5) personSpeed=4.5;
+console.log(personSpeed);
         initializeButtons();
         initializeGUI();
     }
