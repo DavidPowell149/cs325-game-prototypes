@@ -1,3 +1,5 @@
+var enterPressed;
+
 window.onload = function()
 {
     // You might want to start with a template that uses GameStates:
@@ -17,7 +19,7 @@ window.onload = function()
     // Global variables
     var game = new Phaser.Game( 800, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var mainInput;  // The input for the game
-    var enterKey;
+    // var enterKey;
 
 
     // Pre loads assets for game load
@@ -45,20 +47,38 @@ window.onload = function()
         });
         mainInput.focusOutOnEnter = false;
         // mainInput.setText("tst");
-        enterKey = game.input.keyboard.addKey(Phaser.KeyCode.ENTER);
-        enterKey.onDown.add(enterPressed, this);
+        // enterKey = game.input.keyboard.addKey(Phaser.KeyCode.ENTER);
+        // enterKey.onDown.add(enterPressed, this);
+
+
     }
 
     // Runs every tick/iteration/moment/second
     function update()
     {
-
+        // var answer = prompt("Test: ");
+        // console.log(answer);
     }
 
 
-    function enterPressed()
+    enterPressed = function()
     {
+        // Grab value
         console.log("Hit enter: " + mainInput.value);
+
+        // Delete it and make a new one, because I can't seem to get consecutive inputs to work otherwise.
+        mainInput.endFocus();
+        mainInput.destroy();
+        mainInput = game.add.inputField(0, game.world.height - 50, {
+            font: '18px Arial',
+            fill: 'white',
+            fillAlpha: "0",
+            fontWeight: 'bold',
+            width: game.world.width,
+            padding: 8,
+            placeHolder: ">"
+        });
+        mainInput.startFocus();
     }
 
 };
