@@ -17,33 +17,51 @@ window.onload = function()
     "use strict";
 
     // Global variables
-    var game = new Phaser.Game( 800, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var game = new Phaser.Game(900, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var mainInput;  // The input for the game
-    // var enterKey;
+    var gameStarted = false;    // Boolean flag for if the player has clicked start
+    var startButton;
+
+    // GUI
+    var button_startGame;   // The start button
+    var entryBoxOutline;   // The visual bar outline
+    var entryBoxBounds = {x: 50, y: 600, width: 800, height: 50};  // Area the people should exist in
+    var cardOutline;   // The visual bar outline
+    var cardBoxBounds = {x: 50, y: 200, width: 800, height: 200};  // Area the people should exist in
 
 
     // Pre loads assets for game load
     function preload()
     {
         // Load in game assets
-        //game.load.image( "heart", 'assets/heart.png' );
+        // game.load.image( "heart", 'assets/heart.png' );
 
+        // Draw
+        entryBoxOutline = game.add.graphics(0,0);
+        entryBoxOutline.lineStyle(1, 0x000000, 1);
+        entryBoxOutline.drawRect(entryBoxBounds.x, entryBoxBounds.y, entryBoxBounds.width, entryBoxBounds.height);
+        cardOutline = game.add.graphics(0,0);
+        cardOutline.beginFill(0x0066FF);
+        cardOutline.lineStyle(1, 0x000000, 1);
+        cardOutline.drawRect(cardBoxBounds.x, cardBoxBounds.y, cardBoxBounds.width, cardBoxBounds.height);
     }
 
     // Called on game's initial creation state
     function create()
     {
-        game.add.plugin(PhaserInput.Plugin);
+        game.add.plugin(PhaserInput.Plugin);    // The plugin for text
+        game.stage.backgroundColor = "CC0000";
 
+        startButton = this.add.button(cardBoxBounds.x, cardBoxBounds.y, 'playButton', this.startGame, this, 'over', 'out', 'down');
 
-        mainInput = game.add.inputField(0, game.world.height - 50, {
-            font: '18px Arial',
-            fill: 'white',
-            fillAlpha: "0",
+        mainInput = game.add.inputField(entryBoxBounds.x, entryBoxBounds.y, {
+            font: '40px Arial',
+            fill: 'black',
+            fillAlpha: "1",
             fontWeight: 'bold',
-            width: game.world.width,
-            padding: 8,
-            placeHolder: ">"
+            width: entryBoxBounds.width,
+            padding: 10,
+            placeHolder: "Click here to type. Press enter to submit."
         });
         mainInput.focusOutOnEnter = false;
         // mainInput.setText("tst");
@@ -56,27 +74,34 @@ window.onload = function()
     // Runs every tick/iteration/moment/second
     function update()
     {
-        // var answer = prompt("Test: ");
-        // console.log(answer);
+        if(!gameStarted)
+        {
+
+        }
+        else
+        {
+
+        }
     }
 
 
     enterPressed = function()
     {
         // Grab value
-        console.log("Hit enter: " + mainInput.value);
+        var userInput = mainInput.value;
+        console.log("Hit enter: " + userInput);
 
         // Delete it and make a new one, because I can't seem to get consecutive inputs to work otherwise.
         mainInput.endFocus();
         mainInput.destroy();
-        mainInput = game.add.inputField(0, game.world.height - 50, {
-            font: '18px Arial',
-            fill: 'white',
-            fillAlpha: "0",
+        mainInput = game.add.inputField(entryBoxBounds.x, entryBoxBounds.y, {
+            font: '40px Arial',
+            fill: 'black',
+            fillAlpha: "1",
             fontWeight: 'bold',
-            width: game.world.width,
-            padding: 8,
-            placeHolder: ">"
+            width: entryBoxBounds.width,
+            padding: 10,
+            placeHolder: ""
         });
         mainInput.startFocus();
     }
