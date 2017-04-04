@@ -20,6 +20,11 @@ window.onload = function()
     var game = new Phaser.Game(900, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var mainInput;  // The input for the game
     var gameStarted = false;    // Boolean flag for if the player has clicked start
+    var playerEntering = false;    // Boolean flag for when the player can type in, vs when the card is up
+
+
+    // Game logic
+    var sequenceLength = 10;
 
     // GUI
     var button_startGame;   // The start button
@@ -45,21 +50,12 @@ window.onload = function()
         game.add.plugin(PhaserInput.Plugin);    // The plugin for text
         game.stage.backgroundColor = "CC0000";
 
-        mainInput = game.add.inputField(entryBoxBounds.x, entryBoxBounds.y, {
-            font: '40px Arial',
-            fill: 'black',
-            fillAlpha: "1",
-            fontWeight: 'bold',
-            width: entryBoxBounds.width-15,
-            padding: 10,
-            placeHolder: "Click here to type. Press enter to submit."
-        });
 
 
 
         drawBoxes();
         initializeButton();
-
+        generateSequence();
 
         // Hint text
         var style = { font: "Verdana", fill: "#000000", align: "left", fontSize: "20px"};
@@ -71,13 +67,19 @@ window.onload = function()
     // Runs every tick/iteration/moment/second
     function update()
     {
-        if(!gameStarted)
+        // The game is running
+        if(gameStarted)
         {
+            // The card is up, player must memorize
+            if(!playerEntering)
+            {
 
-        }
-        else
-        {
+            }
+            // The card is down and the player is entering.
+            else
+            {
 
+            }
         }
     }
 
@@ -105,6 +107,20 @@ window.onload = function()
         cardOutline.drawRect(cardBoxBounds.x, cardBoxBounds.y, cardBoxBounds.width, cardBoxBounds.height);
     }
 
+    function generateSequence()
+    {
+        var sequence = "";
+        var i = 0;
+        for(i; i<sequenceLength; i++)
+        {
+            var ascii = Math.floor(Math.random()*26);
+            var char = String.fromCharCode(97 + ascii);
+            sequence += char;
+        }
+        return sequence;
+    }
+
+
     function removeHint()
     {
         hintText.destroy();
@@ -114,6 +130,7 @@ window.onload = function()
     {
         button_startGame.destroy();
         label_startGame.destroy();
+
         gameStarted = true;
     }
 
