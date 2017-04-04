@@ -20,10 +20,11 @@ window.onload = function()
     var game = new Phaser.Game(900, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var mainInput;  // The input for the game
     var gameStarted = false;    // Boolean flag for if the player has clicked start
-    var startButton;
 
     // GUI
     var button_startGame;   // The start button
+    var label_startGame;    // Label for sum of money
+    var hintText;
     var entryBoxOutline;   // The visual bar outline
     var entryBoxBounds = {x: 50, y: 600, width: 800, height: 50};  // Area the people should exist in
     var cardOutline;   // The visual bar outline
@@ -36,14 +37,6 @@ window.onload = function()
         // Load in game assets
         // game.load.image( "heart", 'assets/heart.png' );
 
-        // Draw
-        entryBoxOutline = game.add.graphics(0,0);
-        entryBoxOutline.lineStyle(1, 0x000000, 1);
-        entryBoxOutline.drawRect(entryBoxBounds.x, entryBoxBounds.y, entryBoxBounds.width, entryBoxBounds.height);
-        cardOutline = game.add.graphics(0,0);
-        cardOutline.beginFill(0x0066FF);
-        cardOutline.lineStyle(1, 0x000000, 1);
-        cardOutline.drawRect(cardBoxBounds.x, cardBoxBounds.y, cardBoxBounds.width, cardBoxBounds.height);
     }
 
     // Called on game's initial creation state
@@ -52,23 +45,27 @@ window.onload = function()
         game.add.plugin(PhaserInput.Plugin);    // The plugin for text
         game.stage.backgroundColor = "CC0000";
 
-        startButton = this.add.button(cardBoxBounds.x, cardBoxBounds.y, 'playButton', this.startGame, this, 'over', 'out', 'down');
-
         mainInput = game.add.inputField(entryBoxBounds.x, entryBoxBounds.y, {
             font: '40px Arial',
             fill: 'black',
             fillAlpha: "1",
             fontWeight: 'bold',
-            width: entryBoxBounds.width,
+            width: entryBoxBounds.width-15,
             padding: 10,
             placeHolder: "Click here to type. Press enter to submit."
         });
-        mainInput.focusOutOnEnter = false;
-        // mainInput.setText("tst");
-        // enterKey = game.input.keyboard.addKey(Phaser.KeyCode.ENTER);
-        // enterKey.onDown.add(enterPressed, this);
 
 
+
+        drawBoxes();
+        initializeButton();
+
+
+        // Hint text
+        var style = { font: "Verdana", fill: "#000000", align: "left", fontSize: "20px"};
+        hintText = game.add.text(5, 5, "Instructions:\n\nWhen the letters pop up, try to memorize them as quickly as you can. \nType the sequence as accurately as possible to get points.\nClick on hint to remove it.", style );
+        hintText.inputEnabled = true;
+        hintText.events.onInputUp.add(removeHint, this);
     }
 
     // Runs every tick/iteration/moment/second
@@ -84,6 +81,41 @@ window.onload = function()
         }
     }
 
+    function initializeButton()
+    {
+        button_startGame = game.add.graphics(0, 0);
+        button_startGame.beginFill(0xffff99);
+        button_startGame.lineStyle(1, 0x000000, 1);
+        button_startGame.drawRect(cardBoxBounds.x+(cardBoxBounds.width/2)-100, cardBoxBounds.y+50, 200, 100);
+        button_startGame.inputEnabled = true;
+        button_startGame.events.onInputUp.add(startGame, this);
+        var style = { font: "Verdana", fill: "black", align: "left", fontSize:"24px"};
+        label_startGame = game.add.text(450, 304, "Start Game", style );
+        label_startGame.anchor.setTo(0.5,0.5);
+    }
+
+    function drawBoxes()
+    {
+        // entryBoxOutline = game.add.graphics(0,0);
+        // entryBoxOutline.lineStyle(1, 0x000000, 1);
+        // entryBoxOutline.drawRect(entryBoxBounds.x, entryBoxBounds.y, entryBoxBounds.width, entryBoxBounds.height);
+        cardOutline = game.add.graphics(0,0);
+        cardOutline.beginFill(0x0066FF);
+        cardOutline.lineStyle(1, 0x000000, 1);
+        cardOutline.drawRect(cardBoxBounds.x, cardBoxBounds.y, cardBoxBounds.width, cardBoxBounds.height);
+    }
+
+    function removeHint()
+    {
+        hintText.destroy();
+    }
+
+    function startGame()
+    {
+        button_startGame.destroy();
+        label_startGame.destroy();
+        gameStarted = true;
+    }
 
     enterPressed = function()
     {
@@ -94,16 +126,22 @@ window.onload = function()
         // Delete it and make a new one, because I can't seem to get consecutive inputs to work otherwise.
         mainInput.endFocus();
         mainInput.destroy();
+        generateNewInputBox();
+    }
+
+    function generateNewInputBox()
+    {
         mainInput = game.add.inputField(entryBoxBounds.x, entryBoxBounds.y, {
             font: '40px Arial',
             fill: 'black',
             fillAlpha: "1",
             fontWeight: 'bold',
-            width: entryBoxBounds.width,
+            width: entryBoxBounds.width-15,
             padding: 10,
-            placeHolder: ""
+            placeHolder: "Click here to type. Press enter to submit."
         });
         mainInput.startFocus();
+        mainInput.focusOutOnEnter = false;
     }
 
 };
