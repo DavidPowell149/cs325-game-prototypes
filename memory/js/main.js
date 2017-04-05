@@ -35,6 +35,10 @@ window.onload = function()
     var sequenceLength = 5;
     var sequenceText;
 
+    // Audio
+    var audio_score;
+    var audio_error;
+
 
     // GUI
     var button_startGame;   // The start button
@@ -52,6 +56,8 @@ window.onload = function()
     {
         // Load in game assets
         // game.load.image( "heart", 'assets/heart.png' );
+        game.load.audio( "score", 'assets/audio/score.mp3');
+        game.load.audio( "error", 'assets/audio/error.wav');
 
     }
 
@@ -60,6 +66,8 @@ window.onload = function()
     {
         game.add.plugin(PhaserInput.Plugin);    // The plugin for text
         game.stage.backgroundColor = "4d79ff";
+        audio_score = game.add.audio("score");
+        audio_error = game.add.audio("error");
 
         drawBoxes();
         initializeButton();
@@ -203,13 +211,19 @@ window.onload = function()
     function checking()
     {
         var i=0;
+        var oldScore = score;
         for(i; i<userInput.length; i++)
         {
             if(currentSequence[i] === userInput[i])
             {
                 score++;
-                // Play noise
+                audio_score.play();
             }
+        }
+        if(oldScore === score)  // They got no more points
+        {
+            console.log("asf");
+            audio_error.play();
         }
         label_score.setText("Score: " + score );
     }
