@@ -18,17 +18,28 @@ window.onload = function()
 
     // Global variables
     var game = new Phaser.Game(900, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var score = 0;
     var mainInput;  // The input for the game
     var gameStarted = false;    // Boolean flag for if the player has clicked start
     var playerEntering = false;    // Boolean flag for when the player can type in, vs when the card is up
+    var sequenceUp = false;     // Boolean flag for when the sequence is up
+    var inputBoxExists = false;     // Boolean flag for when the sequence is up
+    var checkAnswer = false;     // Boolean flag for when the sequence is up
+    var currentSequence;
+    var firstFrameSequence;
+    var sequenceDuration = 4*1000;   // How long the sequence is up for
+    var userInput;  // The answer the player gives
 
 
     // Game logic
-    var sequenceLength = 10;
+    var sequenceLength = 5;
+    var sequenceText;
+
 
     // GUI
     var button_startGame;   // The start button
     var label_startGame;    // Label for sum of money
+    var label_score;        // Label for scoring
     var hintText;
     var entryBoxOutline;   // The visual bar outline
     var entryBoxBounds = {x: 50, y: 600, width: 800, height: 50};  // Area the people should exist in
@@ -48,10 +59,7 @@ window.onload = function()
     function create()
     {
         game.add.plugin(PhaserInput.Plugin);    // The plugin for text
-        game.stage.backgroundColor = "CC0000";
-
-
-
+        game.stage.backgroundColor = "4d79ff";
 
         drawBoxes();
         initializeButton();
@@ -62,25 +70,60 @@ window.onload = function()
         hintText = game.add.text(5, 5, "Instructions:\n\nWhen the letters pop up, try to memorize them as quickly as you can. \nType the sequence as accurately as possible to get points.\nClick on hint to remove it.", style );
         hintText.inputEnabled = true;
         hintText.events.onInputUp.add(removeHint, this);
+
+        // Score text
+        style = { font: "20px Verdana-bold", fill: "#000000", align: "center" }; // Make a style
+        //earthHealthLabel = game.add.text( 10, 5, "Health: " + earth.health, earthHealthStyle ); // Apply it
+        label_score = game.add.text(cardBoxBounds.x+cardBoxBounds.width/2, cardBoxBounds.y+cardBoxBounds.height+50, "Score: " + score, style ); // Apply it
+        label_score.anchor.setTo(0.5,0.5);
     }
 
     // Runs every tick/iteration/moment/second
     function update()
     {
+        difficultyIncrease();   // Check if we should make it harder
         // The game is running
         if(gameStarted)
         {
-            // The card is up, player must memorize
-            if(!playerEntering)
+            if(!playerEntering)    // The card is up, player must memorize
             {
-
+                // Haven't displayed the sequence yet
+                if(!sequenceUp)
+                {
+                    currentSequence = generateSequence();
+                    showSequence(currentSequence);
+                    firstFrameSequence = game.time.now;     // set when the sequence popped
+                }
+                if((game.time.now - firstFrameSequence) > sequenceDuration)   // It's been up for long enough
+                {
+                    sequenceText.destroy()  // Remove the sequence
+                    sequenceUp = false;     // Change the state
+                    playerEntering = true;  // It's time for the player to enter their answer
+                }
             }
-            // The card is down and the player is entering.
-            else
+            else // The card is down and the player is entering.
             {
-
+                if(!inputBoxExists)
+                {
+                    inputBoxExists = true;
+                    generateNewInputBox();
+                }
             }
         }
+    }
+
+    function difficultyIncrease()
+    {
+        // If certain score, increase sequence length
+        if(score >= 10) { sequenceLength=6 }
+        else if(score >= 20) { sequenceLength=7 }
+        else if(score >= 30) { sequenceLength=8 }
+        else if(score >= 40) { sequenceLength=9 }
+        else if(score >= 50) { sequenceLength=10 }
+
+        // If certain score, decrease time up
+        if(score >= 20) { sequenceDuration = 3500 }  // Half a second
+        else if(score >= 40) { sequenceDuration = 3000 }  // Half a second
     }
 
     function initializeButton()
@@ -98,14 +141,20 @@ window.onload = function()
 
     function drawBoxes()
     {
-        // entryBoxOutline = game.add.graphics(0,0);
-        // entryBoxOutline.lineStyle(1, 0x000000, 1);
-        // entryBoxOutline.drawRect(entryBoxBounds.x, entryBoxBounds.y, entryBoxBounds.width, entryBoxBounds.height);
         cardOutline = game.add.graphics(0,0);
-        cardOutline.beginFill(0x0066FF);
+        cardOutline.beginFill(0x0039e6);
         cardOutline.lineStyle(1, 0x000000, 1);
         cardOutline.drawRect(cardBoxBounds.x, cardBoxBounds.y, cardBoxBounds.width, cardBoxBounds.height);
     }
+
+    function showSequence(sequence)
+    {
+        var style = { font: "Verdana", fill: "#FFFFFF", align: "left", fontSize: "40px"};
+        sequenceText = game.add.text(cardBoxBounds.x+cardBoxBounds.width/2, cardBoxBounds.y+cardBoxBounds.height/2, sequence, style);
+        sequenceText.anchor.setTo(0.5,0.5);
+        sequenceUp = true;
+    }
+
 
     function generateSequence()
     {
@@ -134,17 +183,38 @@ window.onload = function()
         gameStarted = true;
     }
 
+
     enterPressed = function()
     {
         // Grab value
-        var userInput = mainInput.value;
+        userInput = mainInput.value;
         console.log("Hit enter: " + userInput);
 
         // Delete it and make a new one, because I can't seem to get consecutive inputs to work otherwise.
         mainInput.endFocus();
         mainInput.destroy();
-        generateNewInputBox();
+        inputBoxExists = false; // We just destroyed it. Change the state
+        playerEntering = false; // Player is no longer entering anything
+
+        checking();      // Time to check the answer
     }
+
+
+    function checking()
+    {
+        var i=0;
+        for(i; i<userInput.length; i++)
+        {
+            if(currentSequence[i] === userInput[i])
+            {
+                score++;
+                // Play noise
+            }
+        }
+        label_score.setText("Score: " + score );
+    }
+
+
 
     function generateNewInputBox()
     {
