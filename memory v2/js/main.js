@@ -17,7 +17,7 @@ window.onload = function()
     "use strict";
 
     // Global variables
-    var game = new Phaser.Game(900, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var game = new Phaser.Game(462*2, 250*2, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var score = 0;
     var mainInput;  // The input for the game
     var gameStarted = false;    // Boolean flag for if the player has clicked start
@@ -48,14 +48,14 @@ window.onload = function()
     var entryBoxOutline;   // The visual bar outline
     var entryBoxBounds = {x: 50, y: 600, width: 800, height: 50};  // Area the people should exist in
     var cardOutline;   // The visual bar outline
-    var cardBoxBounds = {x: 50, y: 200, width: 800, height: 200};  // Area the people should exist in
+    var cardBoxBounds = {x: 50, y: 400, width: 800, height: 100};  // Area the people should exist in
 
 
     // Pre loads assets for game load
     function preload()
     {
         // Load in game assets
-        // game.load.image( "heart", 'assets/heart.png' );
+        game.load.image( 'background', 'assets/background.png' );
         game.load.audio( "score", 'assets/audio/score.mp3');
         game.load.audio( "error", 'assets/audio/error.wav');
 
@@ -64,6 +64,9 @@ window.onload = function()
     // Called on game's initial creation state
     function create()
     {
+        // The space background
+        var background = game.add.sprite(0, 0, "background");
+        background.scale.setTo(2,2);  // Original is 462 x 250
         game.add.plugin(PhaserInput.Plugin);    // The plugin for text
         game.stage.backgroundColor = "4d79ff";
         audio_score = game.add.audio("score");
@@ -139,7 +142,7 @@ window.onload = function()
         button_startGame = game.add.graphics(0, 0);
         button_startGame.beginFill(0xffff99);
         button_startGame.lineStyle(1, 0x000000, 1);
-        button_startGame.drawRect(cardBoxBounds.x+(cardBoxBounds.width/2)-100, cardBoxBounds.y+50, 200, 100);
+        button_startGame.drawRect(cardBoxBounds.x+(cardBoxBounds.width/2)-100, cardBoxBounds.y+50, 200, 50);
         button_startGame.inputEnabled = true;
         button_startGame.events.onInputUp.add(startGame, this);
         var style = { font: "Verdana", fill: "black", align: "left", fontSize:"24px"};
