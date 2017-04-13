@@ -28,13 +28,16 @@ window.onload = function()
     var checkAnswer = false;     // Boolean flag for when the sequence is up
     var currentSequence;
     var firstFrameSequence;
-    var sequenceDuration = 100//4*1000;   // How long the sequence is up for
+    var sequenceDuration = 2*1000;   // How long the sequence is up for
     var userInput;  // The answer the player gives
 
 
     // Game logic
     var sequenceLength = 5;
     var sequenceText;
+    var soldier;
+    var soldierGroup;
+
 
     // Audio
     var audio_score;
@@ -80,7 +83,7 @@ window.onload = function()
 
         // Hint text
         var style = { font: "Verdana", fill: "#000000", align: "left", fontSize: "20px", wordWrap: true, wordWrapWidth: 920};
-        label_instructions = game.add.text(5, 90, "Your castle is under attack! A sequence of letters will appear at the bottom of the screen for a short time. Memorize it before it dissapears! Then type it into the input box. The more letters you correctly match, the more soldiers you will kill. If a soldier makes it all the way across the screen, they damage your castle. Don't let your castle fall!", style );
+        label_instructions = game.add.text(5, 90, "Your castle is under attack! A sequence of letters will appear at the bottom of the screen for a short time. Memorize it before it dissapears, then type it into the input box. The more letters you correctly match, the more soldiers you will kill. If a soldier makes it all the way across the screen, they damage your castle. Don't let your castle fall!", style );
 
         // Score text
         style = { font: "20px Verdana-bold", fill: "#000000", align: "center" }; // Make a style
@@ -161,7 +164,7 @@ window.onload = function()
 
     function showSequence(sequence)
     {
-        var style = { font: "Verdana", fill: "#FFFFFF", align: "left", fontSize: "40px"};
+        var style = { font: "Verdana", fill: "#FFFFFF", align: "left", fontSize: "30px"};
         sequenceText = game.add.text(cardBoxBounds.x+cardBoxBounds.width/2, cardBoxBounds.y+cardBoxBounds.height/2, sequence, style);
         sequenceText.anchor.setTo(0.5,0.5);
         sequenceUp = true;
