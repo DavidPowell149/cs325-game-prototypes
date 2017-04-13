@@ -45,6 +45,7 @@ window.onload = function()
     // Audio
     var audio_score;
     var audio_error;
+    var audio_scream;
 
 
     // GUI
@@ -67,6 +68,7 @@ window.onload = function()
         game.load.image( 'background', 'assets/background.png' );
         game.load.audio( "score", 'assets/audio/sword.wav');
         game.load.audio( "error", 'assets/audio/error.wav');
+        game.load.audio( "scream", 'assets/audio/scream.wav' );
         game.load.image( "knight", 'assets/knight.png' );
     }
 
@@ -79,6 +81,7 @@ window.onload = function()
         game.add.plugin(PhaserInput.Plugin);    // The plugin for text
         audio_score = game.add.audio("score");
         audio_error = game.add.audio("error");
+        audio_scream = game.add.audio("scream");
 
         soldierGroup = game.add.group();  // Group for spikes
 
@@ -168,6 +171,7 @@ window.onload = function()
 
                 castleHealth -= soldierDamage;
                 label_health.setText("Castle health: " + castleHealth );
+                audio_scream.play();
                 currentSoldier.destroy()
             }
         }, this);
@@ -176,15 +180,19 @@ window.onload = function()
     function difficultyIncrease()
     {
         // If certain score, increase sequence length
-        if(soldiersKilled >= 10) { sequenceLength=6 }
-        else if(soldiersKilled >= 20) { sequenceLength=7 }
-        else if(soldiersKilled >= 30) { sequenceLength=8 }
-        else if(soldiersKilled >= 40) { sequenceLength=9 }
-        else if(soldiersKilled >= 50) { sequenceLength=10 }
+        if(soldiersKilled >= 10) { sequenceLength=6; soldierSpeed=1.7; }
+        if(soldiersKilled >= 20) { sequenceLength=7; soldierSpeed=2; }
+        if(soldiersKilled >= 30) { sequenceLength=8; soldierSpeed=2.3; }
+        if(soldiersKilled >= 40) { sequenceLength=9; soldierSpeed=2.5; }
+        if(soldiersKilled >= 50) { sequenceLength=10; soldierSpeed=3; }
 
         // If certain score, decrease time up
-        if(soldiersKilled >= 20) { sequenceDuration = 3500 }  // Half a second
-        else if(soldiersKilled >= 40) { sequenceDuration = 3000 }  // Half a second
+        if(soldiersKilled >= 20) { sequenceDuration = 1700 }  // Half a second
+        if(soldiersKilled >= 40) { sequenceDuration = 1500 }  // Half a second
+
+        // If certain score, increase spawn rate
+        if(soldiersKilled >= 20) { soldierSpawnTime = 200 }  // faster
+        if(soldiersKilled >= 40) { soldierSpawnTime = 100 }  // faster
     }
 
     function initializeButton()
@@ -270,12 +278,22 @@ window.onload = function()
         if(scoreThisRound === 0)  // They got no more points
         {
             audio_error.play();
+            spawnExtraSoldiers();
         }
         flashPoints(scoreThisRound);
         killSoldiers(scoreThisRound);
 
+
         label_soldiersKilled.setText("Soldiers killed: " + soldiersKilled );
         label_soldiersKilled.x = game.world.width-5;
+    }
+
+    function spawnExtraSoldiers()
+    {
+        // Spawn extra soldiers when they get some wrong.
+        tempSoldier = game.add.sprite(-50, game.world.height/2+100, "knight");
+        tempSoldier.anchor.setTo(0.5,0.5);
+        soldierGroup.add(tempSoldier);
     }
 
     function flashPoints(points)
