@@ -17,8 +17,9 @@ window.onload = function()
     "use strict";
 
     // Global variables
-    var game = new Phaser.Game(462*2, 250*2, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
-    var score = 0;
+    var game = new Phaser.Game(924, 500, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var castleHealth = 100;
+    var soldiersKilled = 0;
     var mainInput;  // The input for the game
     var gameStarted = false;    // Boolean flag for if the player has clicked start
     var playerEntering = false;    // Boolean flag for when the player can type in, vs when the card is up
@@ -27,7 +28,7 @@ window.onload = function()
     var checkAnswer = false;     // Boolean flag for when the sequence is up
     var currentSequence;
     var firstFrameSequence;
-    var sequenceDuration = 4*1000;   // How long the sequence is up for
+    var sequenceDuration = 100//4*1000;   // How long the sequence is up for
     var userInput;  // The answer the player gives
 
 
@@ -43,12 +44,13 @@ window.onload = function()
     // GUI
     var button_startGame;   // The start button
     var label_startGame;    // Label for sum of money
-    var label_score;        // Label for scoring
-    var hintText;
+    var label_health;        // Label for scoring
+    var label_soldiersKilled;        // Label for scoring
+    var label_instructions;
     var entryBoxOutline;   // The visual bar outline
-    var entryBoxBounds = {x: 50, y: 600, width: 800, height: 50};  // Area the people should exist in
+    var entryBoxBounds = {x: 50, y: 420, width: 400, height: 30};  // Area the people should exist in
     var cardOutline;   // The visual bar outline
-    var cardBoxBounds = {x: 50, y: 400, width: 800, height: 100};  // Area the people should exist in
+    var cardBoxBounds = {x: 20, y: 450, width: 400, height: 40};  // Area the people should exist in
 
 
     // Pre loads assets for game load
@@ -77,16 +79,15 @@ window.onload = function()
         generateSequence();
 
         // Hint text
-        var style = { font: "Verdana", fill: "#000000", align: "left", fontSize: "20px"};
-        hintText = game.add.text(5, 5, "Instructions:\n\nWhen the letters pop up, try to memorize them as quickly as you can. \nType the sequence as accurately as possible to get points.\nClick on hint to remove it.", style );
-        hintText.inputEnabled = true;
-        hintText.events.onInputUp.add(removeHint, this);
+        var style = { font: "Verdana", fill: "#000000", align: "left", fontSize: "20px", wordWrap: true, wordWrapWidth: 920};
+        label_instructions = game.add.text(5, 90, "Your castle is under attack! A sequence of letters will appear at the bottom of the screen for a short time. Memorize it before it dissapears! Then type it into the input box. The more letters you correctly match, the more soldiers you will kill. If a soldier makes it all the way across the screen, they damage your castle. Don't let your castle fall!", style );
 
         // Score text
         style = { font: "20px Verdana-bold", fill: "#000000", align: "center" }; // Make a style
         //earthHealthLabel = game.add.text( 10, 5, "Health: " + earth.health, earthHealthStyle ); // Apply it
-        label_score = game.add.text(cardBoxBounds.x+cardBoxBounds.width/2, cardBoxBounds.y+cardBoxBounds.height+50, "Score: " + score, style ); // Apply it
-        label_score.anchor.setTo(0.5,0.5);
+        label_health = game.add.text(5, 5, "Castle health: " + castleHealth, style ); // Apply it
+        label_soldiersKilled = game.add.text(game.world.width-5, 5, "Soldiers killed: " + soldiersKilled, style ); // Apply it
+        label_soldiersKilled.anchor.setTo(1.0,0);
     }
 
     // Runs every tick/iteration/moment/second
@@ -126,15 +127,15 @@ window.onload = function()
     function difficultyIncrease()
     {
         // If certain score, increase sequence length
-        if(score >= 10) { sequenceLength=6 }
-        else if(score >= 20) { sequenceLength=7 }
-        else if(score >= 30) { sequenceLength=8 }
-        else if(score >= 40) { sequenceLength=9 }
-        else if(score >= 50) { sequenceLength=10 }
+        if(soldiersKilled >= 10) { sequenceLength=6 }
+        else if(soldiersKilled >= 20) { sequenceLength=7 }
+        else if(soldiersKilled >= 30) { sequenceLength=8 }
+        else if(soldiersKilled >= 40) { sequenceLength=9 }
+        else if(soldiersKilled >= 50) { sequenceLength=10 }
 
         // If certain score, decrease time up
-        if(score >= 20) { sequenceDuration = 3500 }  // Half a second
-        else if(score >= 40) { sequenceDuration = 3000 }  // Half a second
+        if(soldiersKilled >= 20) { sequenceDuration = 3500 }  // Half a second
+        else if(soldiersKilled >= 40) { sequenceDuration = 3000 }  // Half a second
     }
 
     function initializeButton()
@@ -142,11 +143,11 @@ window.onload = function()
         button_startGame = game.add.graphics(0, 0);
         button_startGame.beginFill(0xffff99);
         button_startGame.lineStyle(1, 0x000000, 1);
-        button_startGame.drawRect(cardBoxBounds.x+(cardBoxBounds.width/2)-100, cardBoxBounds.y+50, 200, 50);
+        button_startGame.drawRect(game.world.width/2-100, game.world.height/2-25, 200, 50);
         button_startGame.inputEnabled = true;
         button_startGame.events.onInputUp.add(startGame, this);
         var style = { font: "Verdana", fill: "black", align: "left", fontSize:"24px"};
-        label_startGame = game.add.text(450, 304, "Start Game", style );
+        label_startGame = game.add.text(game.world.width/2, game.world.height/2, "Start Game", style );
         label_startGame.anchor.setTo(0.5,0.5);
     }
 
@@ -183,7 +184,7 @@ window.onload = function()
 
     function removeHint()
     {
-        hintText.destroy();
+        label_instructions.destroy();
     }
 
     function startGame()
@@ -214,35 +215,48 @@ window.onload = function()
     function checking()
     {
         var i=0;
-        var oldScore = score;
+        var scoreThisRound = 0;
         for(i; i<userInput.length; i++)
         {
             if(currentSequence[i] === userInput[i])
             {
-                score++;
+                scoreThisRound++;
                 audio_score.play();
             }
         }
-        if(oldScore === score)  // They got no more points
+        if(scoreThisRound === 0)  // They got no more points
         {
-            console.log("asf");
             audio_error.play();
         }
-        label_score.setText("Score: " + score );
+        killSoldiers(scoreThisRound);
+        spawnSoldiers(currentSequence.length-scoreThisRound);
+        label_health.setText("Castle health: " + castleHealth );
+        label_soldiersKilled.setText("Soldiers killed: " + soldiersKilled );
+        label_soldiersKilled.x = game.world.width-5;
     }
 
+    function spawnSoldiers(numToSpawn)
+    {
+        // SPAWN NUMBER OF SOLDIERS
+    }
+
+    function killSoldiers(numKilled)
+    {
+        soldiersKilled += numKilled;
+        // KILL THEM
+    }
 
 
     function generateNewInputBox()
     {
-        mainInput = game.add.inputField(entryBoxBounds.x, entryBoxBounds.y, {
-            font: '40px Arial',
+        mainInput = game.add.inputField(game.world.width/2+50, game.world.height-50, {
+            font: '30px Arial',
             fill: 'black',
             fillAlpha: "1",
             fontWeight: 'bold',
             width: entryBoxBounds.width-15,
-            padding: 10,
-            placeHolder: "Click here to type. Press enter to submit."
+            padding: 4,
+            placeHolder: "Click to focus"
         });
         mainInput.startFocus();
         mainInput.focusOutOnEnter = false;
