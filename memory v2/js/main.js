@@ -53,6 +53,7 @@ window.onload = function()
     var label_health;        // Label for scoring
     var label_soldiersKilled;        // Label for scoring
     var label_instructions;
+    var label_numCorrect;
     var entryBoxOutline;   // The visual bar outline
     var entryBoxBounds = {x: 50, y: 420, width: 400, height: 30};  // Area the people should exist in
     var cardOutline;   // The visual bar outline
@@ -129,6 +130,8 @@ window.onload = function()
                 {
                     inputBoxExists = true;
                     generateNewInputBox();
+
+                    if(label_numCorrect) {label_numCorrect.destroy(); }
                 }
             }
         }
@@ -159,10 +162,12 @@ window.onload = function()
             currentSoldier.x += soldierSpeed;
 
             // Check for collision
-            if(currentSoldier.x > game.world.width+10)
+            if(currentSoldier.x > game.world.width+35)
             {
                 console.log("Soldier attack!");
+
                 castleHealth -= soldierDamage;
+                label_health.setText("Castle health: " + castleHealth );
                 currentSoldier.destroy()
             }
         }, this);
@@ -266,11 +271,20 @@ window.onload = function()
         {
             audio_error.play();
         }
+        flashPoints(scoreThisRound);
         killSoldiers(scoreThisRound);
 
-        label_health.setText("Castle health: " + castleHealth );
         label_soldiersKilled.setText("Soldiers killed: " + soldiersKilled );
         label_soldiersKilled.x = game.world.width-5;
+    }
+
+    function flashPoints(points)
+    {
+        if(points===0){ var style = { font: "Verdana", fill: "#f44242", align: "left", fontSize: "20px", wordWrap: true, wordWrapWidth: 920}; }
+        else { var style = { font: "Verdana", fill: "#56f441", align: "left", fontSize: "20px", wordWrap: true, wordWrapWidth: 920}; }
+
+        label_numCorrect = game.add.text(game.world.width/2, game.world.height-30, "+"+points, style );
+        label_numCorrect.anchor.setTo(0.5,0.5);
     }
 
     function killSoldiers(numKilled)
