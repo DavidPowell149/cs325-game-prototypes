@@ -35,9 +35,12 @@ window.onload = function()
     // Game logic
     var sequenceLength = 5;
     var sequenceText;
-    var soldier;
+    var tempSoldier;
     var soldierGroup;
-
+    var soldierSpeed = 1.5;
+    var soldierDamage = 1;
+    var lastSoldierSpawned = 0;
+    var soldierSpawnTime = 900;
 
     // Audio
     var audio_score;
@@ -61,9 +64,9 @@ window.onload = function()
     {
         // Load in game assets
         game.load.image( 'background', 'assets/background.png' );
-        game.load.audio( "score", 'assets/audio/score.mp3');
+        game.load.audio( "score", 'assets/audio/sword.wav');
         game.load.audio( "error", 'assets/audio/error.wav');
-
+        game.load.image( "knight", 'assets/knight.png' );
     }
 
     // Called on game's initial creation state
@@ -73,9 +76,11 @@ window.onload = function()
         var background = game.add.sprite(0, 0, "background");
         background.scale.setTo(2,2);  // Original is 462 x 250
         game.add.plugin(PhaserInput.Plugin);    // The plugin for text
-        game.stage.backgroundColor = "4d79ff";
         audio_score = game.add.audio("score");
         audio_error = game.add.audio("error");
+
+        soldierGroup = game.add.group();  // Group for spikes
+
 
         drawBoxes();
         initializeButton();
@@ -97,9 +102,11 @@ window.onload = function()
     function update()
     {
         difficultyIncrease();   // Check if we should make it harder
+
         // The game is running
         if(gameStarted)
         {
+            updateSoldiers();
             if(!playerEntering)    // The card is up, player must memorize
             {
                 // Haven't displayed the sequence yet
@@ -125,6 +132,40 @@ window.onload = function()
                 }
             }
         }
+    }
+
+    function updateSoldiers()
+    {
+        // Spawn soldier if allowed
+
+        if((game.time.now - lastSoldierSpawned) > soldierSpawnTime)
+        {
+            var randSpawn = Math.random();
+            if(randSpawn>0.95)   // 5% chance to spawn when allowed
+            {
+                lastSoldierSpawned = game.time.now;
+
+                tempSoldier = game.add.sprite(-50, game.world.height/2+100, "knight");
+                tempSoldier.anchor.setTo(0.5,0.5);
+                soldierGroup.add(tempSoldier);
+            }
+        }
+
+
+        // Do stuff for each spike
+        soldierGroup.forEach( function(currentSoldier)
+        {
+            // Runs for each item in the group
+            currentSoldier.x += soldierSpeed;
+
+            // Check for collision
+            if(currentSoldier.x > game.world.width+10)
+            {
+                console.log("Soldier attack!");
+                castleHealth -= soldierDamage;
+                currentSoldier.destroy()
+            }
+        }, this);
     }
 
     function difficultyIncrease()
@@ -184,17 +225,11 @@ window.onload = function()
         return sequence;
     }
 
-
-    function removeHint()
-    {
-        label_instructions.destroy();
-    }
-
     function startGame()
     {
         button_startGame.destroy();
         label_startGame.destroy();
-
+        label_instructions.destroy();
         gameStarted = true;
     }
 
@@ -232,21 +267,22 @@ window.onload = function()
             audio_error.play();
         }
         killSoldiers(scoreThisRound);
-        spawnSoldiers(currentSequence.length-scoreThisRound);
+
         label_health.setText("Castle health: " + castleHealth );
         label_soldiersKilled.setText("Soldiers killed: " + soldiersKilled );
         label_soldiersKilled.x = game.world.width-5;
-    }
-
-    function spawnSoldiers(numToSpawn)
-    {
-        // SPAWN NUMBER OF SOLDIERS
     }
 
     function killSoldiers(numKilled)
     {
         soldiersKilled += numKilled;
         // KILL THEM
+        soldierGroup.sort("x", Phaser.Group.SORT_DESCENDING);    // Sort by whoever is in front
+        var i;
+        for(i=0; i<numKilled; i++)
+        {
+            soldierGroup.getFirstAlive().destroy();
+        }
     }
 
 
