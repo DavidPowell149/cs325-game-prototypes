@@ -15,30 +15,29 @@ window.onload = function()
     "use strict";
 
     // Global variables
-    var game = new Phaser.Game( 980, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
-    var heart;      // The player
-    var player_acceleration = 0.1;  // The rate at which players change speed
+    var game = new Phaser.Game( 800, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var lemon;      // The player
+    var laser;      // The laser
+    var kitten;      // A kitten
+    var laserGroup; // Group for lasers
+    var kittenGroup; // Group for kittens
+    var laserSpeed = 8;
+    var player_acceleration = 0.15;  // The rate at which players change speed
     var player_current_speed = 0.0; // The player's current speed
-    var player_max_speed = 6.0;     // Max speed player can move
+    var player_max_speed = 7.0;     // Max speed player can move
 
-    var track_current_speed = 3.0;    // Current speed of track
-    var track_max_speed = 7.0;      // Max speed track can move at
-    var track_acceleration = 0.001;   // Track's acceleration rate
+    var leftKey;      // The keys to control the game
+    var rightKey;
+    var downKey;    // So you can't move the webpage
+    var spaceKey;    // So you can't move the webpage
 
-    var upKey;      // The keys to control the game
-    var downKey;
+    // Kitten spawn time and laser fire rate
+    var kittenSpawnTime = 1300;
+    var lastKittenSpawnTime = 0;
+    var laserFireRate = 100;
+    var lastLaserSpawnTime = 0;
 
-    var borderTop; var borderBottom;
-    var spikeGroup;     // A group for the spikes
-    var tempSpike;      // A temp spike to add it to the group
-    var bloodGroup;     // A group for the blood cells
-    var tempBlood;      // A temp blood cell to add it to the group
 
-    // Spikes and blood
-    var spikeSpawnTime = 1300;
-    var lastSpikeSpawnTime = 0;
-    var bloodSpawnTime = 550;
-    var lastBloodSpawnTime = 0;
 
     // Scoring
     var score = 0;
@@ -48,55 +47,118 @@ window.onload = function()
     function preload()
     {
         // Load in game assets
-        game.load.image( "heart", 'assets/heart.png' );
-        game.load.image( "blood-cell", 'assets/blood_cell.png' );
-        game.load.image( "border", 'assets/border.png' );
-        game.load.image( "spike-bottom", 'assets/spike_bottom.png' );
-        game.load.image( "spike-top", 'assets/spike_top.png' );
+        game.load.image( "lemon", 'assets/lemon.png' );
+        game.load.image( "kitten", 'assets/kitten.png' );
+        game.load.image( "laser", 'assets/laser.png' );
     }
 
     // Called on game's initial creation state
     function create()
     {
+        game.physics.startSystem(Phaser.Physics.ARCADE);
         // The yellow color background
         game.stage.backgroundColor = "FFFFCC";
 
-        lemon = game.add.sprite(game.world.centerX, game.world.height-150, "lemon");
+        lemon = game.add.sprite(game.world.centerX, game.world.height-50, "lemon");
+        lemon.scale.setTo(0.5,0.5);
+        lemon.anchor.setTo(0.5,0.5);
 
+        laserGroup = game.add.group();
+        kittenGroup = game.add.group();
+        laserGroup.physicsBodyType = Phaser.Physics.ARCADE;
+
+        // Initialize the keys
+        leftKey = game.input.keyboard.addKey(Phaser.KeyCode.LEFT);
+        rightKey = game.input.keyboard.addKey(Phaser.KeyCode.RIGHT);
+        downKey = game.input.keyboard.addKey(Phaser.KeyCode.DOWN);
+        spaceKey = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
     }
 
     // Runs every tick/iteration/moment/second
     function update()
     {
         playerMovement()
-        boundryCheck();
-        updateTrack();
-        updateScore();
+        // boundryCheck();
+        moveLasers();
+        moveKittens();
     }
 
+
+    function moveKittens()
+    {
+        // Do stuff for each laser
+        kittenGroup.forEach( function(currentLaser)
+        {
+            // Runs for each item in the group
+            currentLaser.y -= laserSpeed;
+
+            if(currentLaser.y < 50)
+            {
+                laserGroup.remove(currentLaser, true);  // Removes the laser from the group, and kills it
+            }
+
+        }, this);
+
+        // Only allowed to be spawned once per press
+        spaceKey.onDown.add(function(key)
+        {
+            lastLaserSpawnTime = game.time.now;
+
+            laser = game.add.sprite(lemon.x, lemon.y-120, "laser");
+            laser.scale.setTo(0.4,0.4);
+            laserGroup.add(laser);
+        }, this);
+    }
+
+    function moveLasers()
+    {
+        // Do stuff for each laser
+        laserGroup.forEach( function(currentLaser)
+        {
+            // Runs for each item in the group
+            currentLaser.y -= laserSpeed;
+
+            if(currentLaser.y < 50)
+            {
+                laserGroup.remove(currentLaser, true);  // Removes the laser from the group, and kills it
+            }
+
+        }, this);
+
+        // Only allowed to be spawned once per press
+        spaceKey.onDown.add(function(key)
+        {
+            lastLaserSpawnTime = game.time.now;
+
+            laser = game.add.sprite(lemon.x, lemon.y-120, "laser");
+            laser.scale.setTo(0.4,0.4);
+            laserGroup.add(laser);
+        }, this);
+    }
 
 
 
 
     function playerMovement()
     {
-        if (upKey.isDown && downKey.isDown) { accelerateIdle() }   // Both are pressed. Do nothing
+        if (leftKey.isDown && rightKey.isDown) { accelerateIdle() }   // Both are pressed. Do nothing
         else
         {
-            if (!upKey.isDown && !downKey.isDown) { accelerateIdle() }   // Nothing is being pressed
-            if(!heart.overlap(borderTop))
+            if (!leftKey.isDown && !rightKey.isDown) { accelerateIdle() }   // Nothing is being pressed
+            // if(lemon.x>100)
             {
-                if (upKey.isDown) { accelerate(1); moveUp(); }
+                if (leftKey.isDown) { accelerate(1); moveLeft(); }
             }
-            else { accelerateIdle() }
-            if(!heart.overlap(borderBottom))
+            // else { accelerateIdle() }
+            // if(lemon.x<game.world.width-100)
             {
-                if (downKey.isDown) { accelerate(-1); moveDown();  }
+                if (rightKey.isDown) { accelerate(-1); moveRight();  }
             }
-            else { accelerateIdle() }
-
-
+            // else { accelerateIdle() }
         }
+        // Infinite movement
+        if(lemon.x < -30) { lemon.x = game.world.width }
+        if(lemon.x > game.world.width+30) { lemon.x = 0 }
     }
 
     function accelerate(magnitude)
@@ -135,32 +197,25 @@ window.onload = function()
         if(player_current_speed > 0)
         {
             player_current_speed -= player_acceleration;    // Move towards 0
-            heart.y -= player_current_speed;
+            lemon.x -= player_current_speed;
         }
 
         else if(player_current_speed < 0)
         {
             player_current_speed += player_acceleration;    // Move towards 0
-            heart.y -= player_current_speed;
+            lemon.x -= player_current_speed;
         }
-
     }
 
-    function moveUp()
+    function moveLeft()
     {
         accelerate(1);
-        heart.y -= player_current_speed;
+        lemon.x -= player_current_speed;
     }
 
-    function moveDown()
+    function moveRight()
     {
         accelerate(-1);
-        heart.y -= player_current_speed;
-    }
-
-    function boundryCheck()
-    {
-        if(heart.y < borderTop.height+heart.height/2) {heart.y = borderTop.height+heart.height/2;}
-        if(heart.y > game.world.height - (borderBottom.height+heart.height/2)) {heart.y = game.world.height - (borderBottom.height+heart.height/2);}
+        lemon.x -= player_current_speed;
     }
 };
