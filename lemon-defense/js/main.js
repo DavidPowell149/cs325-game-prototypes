@@ -17,15 +17,11 @@ window.onload = function()
     // Global variables
     var game = new Phaser.Game( 800, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var lemon;      // The player
-    var laser;      // The laser
-    var kitten;      // A kitten
+    var lemonGroup;      // The player
     var laserGroup; // Group for lasers
     var kittenGroup; // Group for kittens
     var laserSpeed = 500;
     var kittenSpeed = 200;
-    var player_acceleration = 0.15;  // The rate at which players change speed
-    var player_current_speed = 0.0; // The player's current speed
-    var player_max_speed = 7.0;     // Max speed player can move
 
 
     // Kitten spawn time and laser fire rate
@@ -33,7 +29,6 @@ window.onload = function()
     var lastKittenSpawnTime = 0;
     var laserFireRate = 200;
     var lastLaserSpawnTime = 0;
-
 
 
     // Scoring
@@ -56,9 +51,16 @@ window.onload = function()
         // The yellow color background
         game.stage.backgroundColor = "FFFFCC";
 
-        lemon = game.add.sprite(game.world.centerX, game.world.centerY, "lemon");
-        lemon.scale.setTo(0.4,0.4);
-        lemon.anchor.setTo(0.4,0.4);
+        // lemon = game.add.sprite(game.world.centerX, game.world.centerY, "lemon");
+        lemonGroup = game.add.group();
+        lemonGroup.enableBody = true;
+        lemonGroup.physicsBodyType = Phaser.Physics.ARCADE
+        lemonGroup.createMultiple(1, "lemon");
+
+        lemon = lemonGroup.getFirstDead();
+        lemon.reset(game.world.centerX, game.world.centerY);
+        lemon.scale.setTo(0.4);
+        lemon.anchor.setTo(0.5);
 
         laserGroup = game.add.group();
         laserGroup.enableBody = true;
@@ -70,16 +72,32 @@ window.onload = function()
         kittenGroup = game.add.group();
         kittenGroup.enableBody = true;
         kittenGroup.physicsBodyType = Phaser.Physics.ARCADE
+        kittenGroup.createMultiple(50, "kitten");
     }
 
     // Runs every tick/iteration/moment/second
     function update()
     {
-        // playerMovement()
-        // moveKittens();
+        moveKittens();
         shootLaser();
+
+        // Check collision
+        game.physics.arcade.overlap(lemonGroup, kittenGroup, lemonHurt, null, this);
+        game.physics.arcade.overlap(laserGroup, kittenGroup, killKitten, null, this);
     }
 
+    function killKitten(laser, kitten)
+    {
+        // Both entities should be removed
+        kitten.kill();
+        laser.kill();
+
+    }
+
+    function lemonHurt(lemon, kitten)
+    {
+        // console.log("LEMON IS HURT");
+    }
 
     function moveKittens()
     {
@@ -87,10 +105,11 @@ window.onload = function()
         if((game.time.now - lastKittenSpawnTime) > kittenSpawnTime)
         {
             lastKittenSpawnTime = game.time.now;
-            kitten = game.add.sprite(Math.random()*(game.world.width-100), -75, "kitten");
+            var kitten = kittenGroup.getFirstDead();
+            // kitten = game.add.sprite(Math.random()*(game.world.width-100), -75, "kitten");
+            kitten.reset(Math.random()*(game.world.width-100), 75);
             kitten.anchor.setTo(0.5);
             kitten.scale.setTo(0.4);
-            kittenGroup.add(kitten);
         }
 
 
@@ -99,14 +118,6 @@ window.onload = function()
         {
             // Runs for each item in the group
             game.physics.arcade.moveToObject(currentKitten, lemon, kittenSpeed);
-
-
-            // currentKitten.y += kittenSpeed;
-            //
-            // if(currentKitten.y > game.world.height-100)
-            // {
-            //     kittenGroup.remove(currentKitten, true);  // Removes the laser from the group, and kills it
-            // }
 
         }, this);
     }
@@ -121,12 +132,8 @@ window.onload = function()
                 // Shooting
                 lastLaserSpawnTime = game.time.now;
 
-                // laser = game.add.sprite(lemon.x, lemon.y, "laser");
-
-
-
                 var laser = laserGroup.getFirstDead();
-                laser.scale.setTo(0.4);
+                laser.scale.setTo(0.1);
                 laser.anchor.setTo(0.5);
                 laser.reset(lemon.x, lemon.y);
                 laser.rotation = game.physics.arcade.angleToPointer(lemon);
