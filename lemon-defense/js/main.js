@@ -21,20 +21,17 @@ window.onload = function()
     var kitten;      // A kitten
     var laserGroup; // Group for lasers
     var kittenGroup; // Group for kittens
-    var laserSpeed = 8;
+    var laserSpeed = 500;
+    var kittenSpeed = 200;
     var player_acceleration = 0.15;  // The rate at which players change speed
     var player_current_speed = 0.0; // The player's current speed
     var player_max_speed = 7.0;     // Max speed player can move
 
-    var leftKey;      // The keys to control the game
-    var rightKey;
-    var downKey;    // So you can't move the webpage
-    var spaceKey;    // So you can't move the webpage
 
     // Kitten spawn time and laser fire rate
     var kittenSpawnTime = 1300;
     var lastKittenSpawnTime = 0;
-    var laserFireRate = 100;
+    var laserFireRate = 200;
     var lastLaserSpawnTime = 0;
 
 
@@ -59,163 +56,83 @@ window.onload = function()
         // The yellow color background
         game.stage.backgroundColor = "FFFFCC";
 
-        lemon = game.add.sprite(game.world.centerX, game.world.height-50, "lemon");
-        lemon.scale.setTo(0.5,0.5);
-        lemon.anchor.setTo(0.5,0.5);
+        lemon = game.add.sprite(game.world.centerX, game.world.centerY, "lemon");
+        lemon.scale.setTo(0.4,0.4);
+        lemon.anchor.setTo(0.4,0.4);
 
         laserGroup = game.add.group();
-        kittenGroup = game.add.group();
-        laserGroup.physicsBodyType = Phaser.Physics.ARCADE;
+        laserGroup.enableBody = true;
+        laserGroup.physicsBodyType = Phaser.Physics.ARCADE
+        laserGroup.createMultiple(50, "laser");
+        laserGroup.setAll("checkWorldBounds", true);
+        laserGroup.setAll("outOfBoundsKill", true);
 
-        // Initialize the keys
-        leftKey = game.input.keyboard.addKey(Phaser.KeyCode.LEFT);
-        rightKey = game.input.keyboard.addKey(Phaser.KeyCode.RIGHT);
-        downKey = game.input.keyboard.addKey(Phaser.KeyCode.DOWN);
-        spaceKey = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+        kittenGroup = game.add.group();
+        kittenGroup.enableBody = true;
+        kittenGroup.physicsBodyType = Phaser.Physics.ARCADE
     }
 
     // Runs every tick/iteration/moment/second
     function update()
     {
-        playerMovement()
-        // boundryCheck();
-        moveLasers();
-        moveKittens();
+        // playerMovement()
+        // moveKittens();
+        shootLaser();
     }
 
 
     function moveKittens()
     {
-        // Do stuff for each laser
-        kittenGroup.forEach( function(currentLaser)
+        // Spawn kitten if allowed
+        if((game.time.now - lastKittenSpawnTime) > kittenSpawnTime)
+        {
+            lastKittenSpawnTime = game.time.now;
+            kitten = game.add.sprite(Math.random()*(game.world.width-100), -75, "kitten");
+            kitten.anchor.setTo(0.5);
+            kitten.scale.setTo(0.4);
+            kittenGroup.add(kitten);
+        }
+
+
+        // Do stuff for each kitten
+        kittenGroup.forEach( function(currentKitten)
         {
             // Runs for each item in the group
-            currentLaser.y -= laserSpeed;
+            game.physics.arcade.moveToObject(currentKitten, lemon, kittenSpeed);
 
-            if(currentLaser.y < 50)
-            {
-                laserGroup.remove(currentLaser, true);  // Removes the laser from the group, and kills it
-            }
 
-        }, this);
-
-        // Only allowed to be spawned once per press
-        spaceKey.onDown.add(function(key)
-        {
-            lastLaserSpawnTime = game.time.now;
-
-            laser = game.add.sprite(lemon.x, lemon.y-120, "laser");
-            laser.scale.setTo(0.4,0.4);
-            laserGroup.add(laser);
-        }, this);
-    }
-
-    function moveLasers()
-    {
-        // Do stuff for each laser
-        laserGroup.forEach( function(currentLaser)
-        {
-            // Runs for each item in the group
-            currentLaser.y -= laserSpeed;
-
-            if(currentLaser.y < 50)
-            {
-                laserGroup.remove(currentLaser, true);  // Removes the laser from the group, and kills it
-            }
+            // currentKitten.y += kittenSpeed;
+            //
+            // if(currentKitten.y > game.world.height-100)
+            // {
+            //     kittenGroup.remove(currentKitten, true);  // Removes the laser from the group, and kills it
+            // }
 
         }, this);
-
-        // Only allowed to be spawned once per press
-        spaceKey.onDown.add(function(key)
-        {
-            lastLaserSpawnTime = game.time.now;
-
-            laser = game.add.sprite(lemon.x, lemon.y-120, "laser");
-            laser.scale.setTo(0.4,0.4);
-            laserGroup.add(laser);
-        }, this);
     }
 
 
-
-
-    function playerMovement()
+    function shootLaser()
     {
-        if (leftKey.isDown && rightKey.isDown) { accelerateIdle() }   // Both are pressed. Do nothing
-        else
+        if(game.input.activePointer.isDown)
         {
-            if (!leftKey.isDown && !rightKey.isDown) { accelerateIdle() }   // Nothing is being pressed
-            // if(lemon.x>100)
+            if((game.time.now - lastLaserSpawnTime) > laserFireRate)
             {
-                if (leftKey.isDown) { accelerate(1); moveLeft(); }
-            }
-            // else { accelerateIdle() }
-            // if(lemon.x<game.world.width-100)
-            {
-                if (rightKey.isDown) { accelerate(-1); moveRight();  }
-            }
-            // else { accelerateIdle() }
-        }
-        // Infinite movement
-        if(lemon.x < -30) { lemon.x = game.world.width }
-        if(lemon.x > game.world.width+30) { lemon.x = 0 }
-    }
+                // Shooting
+                lastLaserSpawnTime = game.time.now;
 
-    function accelerate(magnitude)
-    {
-        if(magnitude === 1)
-            player_current_speed += player_acceleration * 2.0;
-        else if(magnitude === -1)
-            player_current_speed -= player_acceleration * 2.0;
+                // laser = game.add.sprite(lemon.x, lemon.y, "laser");
 
 
-        if(player_current_speed > 0)
-        {
-            if(player_current_speed > player_max_speed)
-            {
-                player_current_speed = player_max_speed;
+
+                var laser = laserGroup.getFirstDead();
+                laser.scale.setTo(0.4);
+                laser.anchor.setTo(0.5);
+                laser.reset(lemon.x, lemon.y);
+                laser.rotation = game.physics.arcade.angleToPointer(lemon);
+                game.physics.arcade.moveToPointer(laser, laserSpeed);
+
             }
         }
-        else if(player_current_speed < 0)
-        {
-            if(player_current_speed < -player_max_speed)
-            {
-                player_current_speed = -player_max_speed;
-            }
-        }
-    }
-
-    // Slowly brings the speed back down to zero if no button is pressed
-    function accelerateIdle()
-    {
-        // Deadzone
-        if(Math.abs(player_current_speed) < 0.00001)
-        {
-            player_current_speed = 0;
-        }
-
-        if(player_current_speed > 0)
-        {
-            player_current_speed -= player_acceleration;    // Move towards 0
-            lemon.x -= player_current_speed;
-        }
-
-        else if(player_current_speed < 0)
-        {
-            player_current_speed += player_acceleration;    // Move towards 0
-            lemon.x -= player_current_speed;
-        }
-    }
-
-    function moveLeft()
-    {
-        accelerate(1);
-        lemon.x -= player_current_speed;
-    }
-
-    function moveRight()
-    {
-        accelerate(-1);
-        lemon.x -= player_current_speed;
     }
 };
