@@ -15,17 +15,17 @@ window.onload = function()
     "use strict";
 
     // Global variables
-    var game = new Phaser.Game( 800, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
+    var game = new Phaser.Game( 700, 700, Phaser.AUTO, 'game', { preload: preload, create: create, update: update } );
     var lemon;      // The player
     var lemonGroup;      // The player
     var laserGroup; // Group for lasers
     var kittenGroup; // Group for kittens
     var laserSpeed = 500;
     var kittenSpeed = 200;
-
+    var gameStarted = false;
 
     // Kitten spawn time and laser fire rate
-    var kittenSpawnTime = 1300;
+    var kittenSpawnTime = 100//1300;
     var lastKittenSpawnTime = 0;
     var laserFireRate = 200;
     var lastLaserSpawnTime = 0;
@@ -34,11 +34,19 @@ window.onload = function()
     // Scoring
     var score = 0;
     var scoreText;
+    var health = 100;
+    var healthText;
+
+    // Game start
+    var button_startGame;   // The start button
+    var label_startGame;    // Label for starting game
+    var label_instructions;
 
     // Pre loads assets for game load
     function preload()
     {
         // Load in game assets
+        game.load.image( "background", 'assets/background.png' );
         game.load.image( "lemon", 'assets/lemon.png' );
         game.load.image( "kitten", 'assets/kitten.png' );
         game.load.image( "laser", 'assets/laser.png' );
@@ -49,7 +57,8 @@ window.onload = function()
     {
         game.physics.startSystem(Phaser.Physics.ARCADE);
         // The yellow color background
-        game.stage.backgroundColor = "FFFFCC";
+        var background = game.add.sprite(0, 0, "background");
+        background.scale.setTo(1.4)
 
         // lemon = game.add.sprite(game.world.centerX, game.world.centerY, "lemon");
         lemonGroup = game.add.group();
@@ -73,17 +82,30 @@ window.onload = function()
         kittenGroup.enableBody = true;
         kittenGroup.physicsBodyType = Phaser.Physics.ARCADE
         kittenGroup.createMultiple(50, "kitten");
+
+        initializeButton();
+        var style = { font: "Verdana", fill: "#000000", align: "left", fontSize: "20px", wordWrap: true, wordWrapWidth: 690};
+        label_instructions = game.add.text(5, 90, "The kittens are trying to kill the world's last lemon! Kittens don't like water though, so click to throw some water in the direction of a kitten. Save the last lemon!", style );
+
+        var style = { font: "15px Verdana", fill: "#000000", align: "center" };
+        scoreText = game.add.text(game.world.width-10, 5, "Score: " + score, style );
+        scoreText.anchor.setTo(1.0, 0.0);
+
+        healthText = game.add.text(20, 5, "Health: " + health, style );
     }
 
     // Runs every tick/iteration/moment/second
     function update()
     {
-        moveKittens();
-        shootLaser();
+        if(gameStarted)
+        {
+            moveKittens();
+            shootLaser();
 
-        // Check collision
-        game.physics.arcade.overlap(lemonGroup, kittenGroup, lemonHurt, null, this);
-        game.physics.arcade.overlap(laserGroup, kittenGroup, killKitten, null, this);
+            // Check collision
+            game.physics.arcade.overlap(lemonGroup, kittenGroup, lemonHurt, null, this);
+            game.physics.arcade.overlap(laserGroup, kittenGroup, killKitten, null, this);
+        }
     }
 
     function killKitten(laser, kitten)
@@ -91,12 +113,20 @@ window.onload = function()
         // Both entities should be removed
         kitten.kill();
         laser.kill();
-
+        score += 1;
+        updateGUI();
     }
 
     function lemonHurt(lemon, kitten)
     {
-        // console.log("LEMON IS HURT");
+        kitten.kill();
+        health -= 10;
+        updateGUI();
+        if(health<=0)
+        {
+            health = 0;
+            gameOver();
+        }
     }
 
     function moveKittens()
@@ -106,12 +136,18 @@ window.onload = function()
         {
             lastKittenSpawnTime = game.time.now;
             var kitten = kittenGroup.getFirstDead();
-            // kitten = game.add.sprite(Math.random()*(game.world.width-100), -75, "kitten");
-            kitten.reset(Math.random()*(game.world.width-100), 75);
+            var buffer = 30;
+            var randX = getRandom(-(buffer*3), game.world.width+(buffer*3));
+            var randY = getRandom(-(buffer*3), game.world.height+(buffer*3));
+            while( (randX>(-buffer) && randX<(game.world.width+buffer)) && (randY>(-buffer) && randY<(game.world.height+buffer)) )
+            {
+                randX = getRandom(-(buffer*3), game.world.width+(buffer*3));
+                randY = getRandom(-(buffer*3), game.world.height+(buffer*3));
+            }
+            kitten.reset(randX, randY);
             kitten.anchor.setTo(0.5);
             kitten.scale.setTo(0.4);
         }
-
 
         // Do stuff for each kitten
         kittenGroup.forEach( function(currentKitten)
@@ -122,6 +158,40 @@ window.onload = function()
         }, this);
     }
 
+    function startGame()
+    {
+        button_startGame.destroy();
+        label_startGame.visible = false;
+        label_instructions.destroy();
+        gameStarted = true;
+    }
+
+    function initializeButton()
+    {
+        button_startGame = game.add.graphics(0, 0);
+        button_startGame.beginFill(0xffff99);
+        button_startGame.lineStyle(1, 0x000000, 1);
+        button_startGame.drawRect(game.world.width/2-100, game.world.height/2-50, 200, 100);
+        button_startGame.inputEnabled = true;
+        button_startGame.events.onInputUp.add(startGame, this);
+        var style = { font: "Verdana", fill: "black", align: "left", fontSize:"24px"};
+        label_startGame = game.add.text(game.world.width/2, game.world.height/2, "Start Game", style );
+        label_startGame.anchor.setTo(0.5,0.5);
+    }
+
+    function updateGUI()
+    {
+        scoreText.setText("Score: " + score);
+        healthText.setText("Health: " + health);
+    }
+
+    function gameOver()
+    {
+        label_startGame.visible = true;
+        label_startGame.setText("GAME OVER");
+        gameStarted = false;
+        lemonGroup.removeAll();
+    }
 
     function shootLaser()
     {
@@ -133,7 +203,6 @@ window.onload = function()
                 lastLaserSpawnTime = game.time.now;
 
                 var laser = laserGroup.getFirstDead();
-                laser.scale.setTo(0.1);
                 laser.anchor.setTo(0.5);
                 laser.reset(lemon.x, lemon.y);
                 laser.rotation = game.physics.arcade.angleToPointer(lemon);
@@ -141,5 +210,12 @@ window.onload = function()
 
             }
         }
+    }
+
+    function getRandom(min, max)
+    {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 };
