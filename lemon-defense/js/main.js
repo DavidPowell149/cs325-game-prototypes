@@ -25,7 +25,7 @@ window.onload = function()
     var gameStarted = false;
 
     // Kitten spawn time and laser fire rate
-    var kittenSpawnTime = 100//1300;
+    var kittenSpawnTime = 1300;
     var lastKittenSpawnTime = 0;
     var laserFireRate = 200;
     var lastLaserSpawnTime = 0;
@@ -42,6 +42,11 @@ window.onload = function()
     var label_startGame;    // Label for starting game
     var label_instructions;
 
+    // Audio
+    var audio_water;
+    var audio_hiss;
+    var audio_growl;
+
     // Pre loads assets for game load
     function preload()
     {
@@ -50,6 +55,10 @@ window.onload = function()
         game.load.image( "lemon", 'assets/lemon.png' );
         game.load.image( "kitten", 'assets/kitten.png' );
         game.load.image( "laser", 'assets/laser.png' );
+
+        game.load.audio( "water", 'assets/audio/water.wav' );
+        game.load.audio( "hiss", 'assets/audio/hiss.wav' );
+        game.load.audio( "growl", 'assets/audio/growl.wav' );
     }
 
     // Called on game's initial creation state
@@ -87,16 +96,21 @@ window.onload = function()
         var style = { font: "Verdana", fill: "#000000", align: "left", fontSize: "20px", wordWrap: true, wordWrapWidth: 690};
         label_instructions = game.add.text(5, 90, "The kittens are trying to kill the world's last lemon! Kittens don't like water though, so click to throw some water in the direction of a kitten. Save the last lemon!", style );
 
-        var style = { font: "15px Verdana", fill: "#000000", align: "center" };
+        var style = { font: "20px Verdana", fill: "#000000", align: "center" };
         scoreText = game.add.text(game.world.width-10, 5, "Score: " + score, style );
         scoreText.anchor.setTo(1.0, 0.0);
 
         healthText = game.add.text(20, 5, "Health: " + health, style );
+
+        audio_water = game.add.audio("water");
+        audio_hiss = game.add.audio("hiss");
+        audio_growl = game.add.audio("growl");
     }
 
     // Runs every tick/iteration/moment/second
     function update()
     {
+        difficultyIncrease();
         if(gameStarted)
         {
             moveKittens();
@@ -108,9 +122,21 @@ window.onload = function()
         }
     }
 
+    function difficultyIncrease()
+    {
+        // If certain score, increase sequence length
+        if(score >= 5) { kittenSpawnTime = 1000 }
+        if(score >= 10) { kittenSpawnTime = 800 }
+        if(score >= 15) { kittenSpawnTime = 600 }
+        if(score >= 20) { kittenSpawnTime = 400 }
+        if(score >= 25) { kittenSpawnTime = 300 }
+        if(score >= 30) { kittenSpawnTime = 200 }
+    }
+
     function killKitten(laser, kitten)
     {
-        // Both entities should be removed
+        audio_hiss = game.add.audio("hiss");
+        audio_hiss.play();
         kitten.kill();
         laser.kill();
         score += 1;
@@ -119,6 +145,8 @@ window.onload = function()
 
     function lemonHurt(lemon, kitten)
     {
+        audio_growl = game.add.audio("growl");
+        audio_growl.play();
         kitten.kill();
         health -= 10;
         updateGUI();
@@ -207,7 +235,8 @@ window.onload = function()
                 laser.reset(lemon.x, lemon.y);
                 laser.rotation = game.physics.arcade.angleToPointer(lemon);
                 game.physics.arcade.moveToPointer(laser, laserSpeed);
-
+                audio_water = game.add.audio("water");
+                audio_water.play();
             }
         }
     }
