@@ -100,7 +100,7 @@ window.onload = function()
         scoreText = game.add.text(game.world.width-10, 5, "Score: " + score, style );
         scoreText.anchor.setTo(1.0, 0.0);
 
-        healthText = game.add.text(20, 5, "Health: " + health, style );
+        healthText = game.add.text(10, 5, "Health: " + health, style );
 
         audio_water = game.add.audio("water");
         audio_hiss = game.add.audio("hiss");
